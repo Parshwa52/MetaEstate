@@ -2,13 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
-import Dashboard from "./pages/Dashboard";
-import Dashboard from "./pages/Dashboard";
 import HomePage from "./pages/HomePage";
-import ListProperty from "./pages/ListProperty";
-import PropertyDetails from "./pages/PropertyDetails";
 import PropertyListing from "./pages/PropertyListing";
-import PropertyMarketplace from "./pages/PropertyMarketplace";
 import Web3 from "web3";
 import propNFT from "../src/abis/propNFT.json";
 import morter from "../src/abis/morter.json";
@@ -137,14 +132,6 @@ const App = () => {
         <Routes>
           <Route exact path="/" element={<HomePage />} />
           <Route exact path="/listings" element={<PropertyListing />} />
-          <Route exact path="/add-property" element={<ListProperty />} />
-          <Route exact path="/property-details" element={<PropertyDetails />} />
-          <Route exact path="/dashboard" element={<Dashboard />} />
-          <Route
-            exact
-            path="/PropertyMarketplace"
-            element={<PropertyMarketplace />}
-          />
         </Routes>
       </BlockchainContext.Provider>
       <Footer />

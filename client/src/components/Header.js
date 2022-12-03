@@ -1,20 +1,35 @@
-
 import React, { useEffect, useState, useContext } from "react";
 import BlockchainContext from "../contexts/BlockchainContext";
 const Header = () => {
-
-  const { web3, accounts, propNFTContract, morterContract, auctionContract, propNFTContractAddress, morterContractAddress, auctionContractAddress } = useContext(BlockchainContext);
+  const {
+    web3,
+    accounts,
+    propNFTContract,
+    morterContract,
+    auctionContract,
+    propNFTContractAddress,
+    morterContractAddress,
+    auctionContractAddress,
+  } = useContext(BlockchainContext);
   const [currentAccount, setCurrentAccount] = useState("");
 
   useEffect(() => {
-
-    console.log({ web3, accounts, propNFTContract, morterContract, auctionContract, propNFTContractAddress, morterContractAddress, auctionContractAddress });
+    console.log({
+      web3,
+      accounts,
+      propNFTContract,
+      morterContract,
+      auctionContract,
+      propNFTContractAddress,
+      morterContractAddress,
+      auctionContractAddress,
+    });
     const init = async () => {
       const accountsNow = await window.ethereum.request({
         method: "eth_requestAccounts",
       });
       setCurrentAccount(accountsNow[0]);
-    }
+    };
     init();
 
     const listener = (accs) => {
@@ -22,8 +37,6 @@ const Header = () => {
     };
 
     window.ethereum.on("accountsChanged", listener);
-
-
   }, []);
   return (
     <>
@@ -31,7 +44,7 @@ const Header = () => {
         <header
           id="sticky-header"
           className="relative bg-[#EEEEE] lg:py-[30px] z-[25] secondary-sticky"
-        // style={{ backgroundColor: "#3AB4F2" }}
+          // style={{ backgroundColor: "#3AB4F2" }}
         >
           <div className="container">
             <div className="grid grid-cols-12">
@@ -105,7 +118,19 @@ const Header = () => {
                           href="/#"
                           className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all"
                         >
-                          {currentAccount ? currentAccount : "Connect Wallet"}
+                          {currentAccount ? (
+                            <>
+                              {currentAccount[0]}
+                              {currentAccount[1]}
+                              {currentAccount[2]}
+                              {currentAccount[3]}
+                              {currentAccount[4]}
+                              {currentAccount[5]}.....
+                              {currentAccount.slice(-4)}
+                            </>
+                          ) : (
+                            "Connect Wallet"
+                          )}
                         </a>
                       </li>
                       <li className="ml-2 sm:ml-5 lg:hidden">
