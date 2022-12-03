@@ -1,12 +1,41 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import InitiateMortgage from "./InitiateMortgageModal";
+import InvestMoneyModal from "./InvestMoneyModal";
 import HomeIcon from "@mui/icons-material/Home";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
+import EnterAuctionModal from "./EnterAuctionModal";
 
 const PropertyCard = ({ data }) => {
+  console.log({ data });
+  const [mortgageModal, setMortgageModal] = useState(false);
+  const [investMoneyModal, setInvestMoneyModal] = useState(false);
+  const [enterAuctionModal, setEnterAuctionModal] = useState(false);
+
+  const [auctionStatus, setAuctionStatus] = useState(true);
+
+  const handleClickOpenMortgageModal = () => {
+    setMortgageModal(!mortgageModal);
+  };
+  const handleClickOpenInvestMoneyModal = () => {
+    setInvestMoneyModal(!investMoneyModal);
+  };
+
+  const handleClickOpenAuctionModal = () => {
+    setEnterAuctionModal(!enterAuctionModal);
+  };
+  const getAuctionStatus = () => {
+    //call to the Auction contract allAuctions function
+    let aucStatus;
+    //setAuctionStatus(auctionStatus)
+  };
+
+  useEffect(() => {
+    getAuctionStatus();
+  }, [setMortgageModal]);
   let navigate = useNavigate();
 
-  const { landtype, category, image } = data;
+  // const { landtype, category, image } = data;
   return (
     <>
       <div className="swiper-slide">
@@ -16,7 +45,7 @@ const PropertyCard = ({ data }) => {
         >
           <div className="relative">
             <img
-              src={image}
+              src={data.image.replace("ipfs://","https://ipfs.io/ipfs/")}
               className="w-full h-full"
               loading="lazy"
               width="370"
@@ -33,25 +62,48 @@ const PropertyCard = ({ data }) => {
               style={{ cursor: "pointer", fontFamily: "Georgia" }}
               className="font-lora leading-tight text-[22px] xl:text-[26px] text-primary hover:text-secondary transition-all font-medium"
             >
-              {landtype}
+              {data.propertyType}
             </h3>
             <h4>
               <a
                 href="property-details"
                 className="font-light text-[14px] leading-[1.75] underline"
               >
-                {data.link}{" "}
+                {data.propertyLocation}{" "}
               </a>
             </h4>
-            <h4>
+            {/* <h4>
               <a
                 href="property-details"
                 className="font-light text-[14px] leading-[1.75] underline"
               >
-                {category}
+                {data.category}
               </a>
-            </h4>
-            {category === 100 ? (
+            </h4> */}
+            {mortgageModal && (
+              <InitiateMortgage
+                open={mortgageModal}
+                setOpen={handleClickOpenMortgageModal}
+              />
+            )}
+            {investMoneyModal && (
+              <InvestMoneyModal
+                open={investMoneyModal}
+                setOpen={handleClickOpenInvestMoneyModal}
+              />
+            )}
+            {enterAuctionModal && (
+              <EnterAuctionModal
+                open={enterAuctionModal}
+                setOpen={handleClickOpenAuctionModal}
+              />
+            )}
+
+            {data.auctionStarted ? (
+              <button onClick={handleClickOpenAuctionModal} className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all">
+                Enter the Auction
+              </button>
+            ) : data.category === 100 ? (
               <div style={{ textAlign: "center" }}>
                 <button
                   style={{
@@ -65,22 +117,26 @@ const PropertyCard = ({ data }) => {
                 <button
                   className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all"
                   style={{ display: "inline-block" }}
+                  onClick={handleClickOpenMortgageModal}
                 >
                   Initiate Mortgage
                 </button>
               </div>
-            ) : category === 200 ? (
-              <button className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all">
+            ) : data.category === 200 ? (
+              <button
+                onClick={handleClickOpenInvestMoneyModal}
+                className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all"
+              >
                 Invest Risk Free
               </button>
-            ) : category === 300 ? (
+            ) : data.category === 300 ? (
               <button className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all">
                 Initiate Final Trade
               </button>
             ) : null}
             <br />
             <span style={{ fontSize: "18px", fontWeight: "500" }}>
-              Created on: 25 November, 2021
+              Created on: 4 December, 2022
             </span>
             <ul className="flex flex-wrap items-center   mt-[10px] mb-[15px] pb-[10px] border-b border-[#E0E0E0]">
               <li
@@ -106,36 +162,36 @@ const PropertyCard = ({ data }) => {
                 className="flex flex-wrap items-center pr-[25px] sm:pr-[5px] md:pr-[25px] border-r border-[#E0DEDE]"
               >
                 <PermIdentityIcon />
-                {data.landCreator[0]}
-                {data.landCreator[1]}
-                {data.landCreator[2]}
-                {data.landCreator[3]}
-                {data.landCreator[4]}
-                {data.landCreator[5]}.....
-                {data.landCreator.slice(-4)}
+                {data.creator.toString()[0]}
+                {data.creator.toString()[1]}
+                {data.creator.toString()[2]}
+                {data.creator.toString()[3]}
+                {data.creator.toString()[4]}
+                {data.creator.toString()[5]}.....
+                {data.creator.toString().slice(-4)}
               </li>
               <li
                 style={{ fontSize: "16px", margin: "0 10px" }}
                 className="flex flex-wrap items-center pr-[25px] sm:pr-[10px] md:pr-[25px] border-r border-[#E0DEDE]"
               >
                 <HomeIcon />
-                {data.nftContract[0]}
-                {data.nftContract[1]}
-                {data.nftContract[2]}
-                {data.nftContract[3]}
+                {data.nftContract.toString()[0]}
+                {data.nftContract.toString()[1]}
+                {data.nftContract.toString()[2]}
+                {data.nftContract.toString()[3]}
                 {data.nftContract[4]}
                 {data.nftContract[5]}.....
                 {data.nftContract.slice(-4)}
               </li>
               <li className="flex flex-wrap items-center">
-                [{data.coordinates[0][0]}]{"\u00A0"}:{"\u00A0"}[
-                {data.coordinates[0][1]}]
+                [{data.coordinateX}]{"\u00A0"}:{"\u00A0"}[
+                {data.coordinateY}]
               </li>
             </ul>
             <ul>
               <li className="flex flex-wrap items-center justify-between">
                 <span className="font-lora text-base text-primary leading-none font-medium">
-                  Price: {data.price} <i className="fab fa-ethereum"></i>{" "}
+                  Price: {parseFloat(parseInt(data.propertyPrice)/Math.pow(10,18))} <i className="fab fa-ethereum"></i>{" "}
                 </span>
               </li>
             </ul>

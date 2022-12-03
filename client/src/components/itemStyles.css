@@ -1,0 +1,14 @@
+.item-container {
+    display: flex;
+    flex-direction: column;
+    
+    
+  }
+  .item-label {
+    font-weight: 600;
+    
+  }
+  .item-img {
+    height: 500px;
+    width:500px;
+  }

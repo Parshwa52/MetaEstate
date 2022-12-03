@@ -1,16 +1,105 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
 import PropertyCard from "../components/PropertyCard";
 import { useNavigate } from "react-router-dom";
-import { propertyCollection } from "./propertyMetaData";
+// import { propertyCollection } from "./propertyMetaData";
+import BlockchainContext from "../contexts/BlockchainContext";
+import dotenv from "dotenv";
+import axios from "axios";
+dotenv.config();
 const PropertyListing = () => {
+  const {
+    web3,
+    accounts,
+    propNFTContract,
+    morterContract,
+    auctionContract,
+    propNFTContractAddress,
+    morterContractAddress,
+    auctionContractAddress,
+  } = useContext(BlockchainContext);
   let navigate = useNavigate();
   const [sportList, setSportList] = useState([]);
 
   const [selectedCategory, setSelectedCategory] = useState();
+  useEffect(() => {
+    //console.log({ web3, accounts, propNFTContract, morterContract, auctionContract, propNFTContractAddress, morterContractAddress, auctionContractAddress });
+    if (morterContract) fetchData();
+
+    // get all data from covalent about all NFTs
+
+    //var allproperties=[];
+  }, [accounts]);
 
   useEffect(() => {
-    setSportList(propertyCollection);
+    //setSportList(propertyCollection);
   }, [sportList]);
+
+  // console.log({ web3, accounts, propNFTContract, morterContract, auctionContract, propNFTContractAddress, morterContractAddress, auctionContractAddress });
+
+  const fetchData = async () => {
+    console.log({ morterContract });
+    const totalPropertyCount = await morterContract.methods
+      .propertycounter()
+      .call();
+    var totalPropertyCountInt = parseInt(totalPropertyCount);
+    const networkId = await web3.eth.net.getId();
+    var allproperties = [];
+    var myHeaders = new Headers();
+    //console.log(process.env.REACT_APP_COVALENT_API_KEY);
+    const COVALENT_KEY = process.env.REACT_APP_COVALENT_API_KEY;
+    console.log({ COVALENT_KEY });
+    var authenticationHeader = authenticateUser(COVALENT_KEY, "");
+    console.log({ authenticationHeader });
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", authenticationHeader);
+
+    var requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+
+    for (var i = 0; i < totalPropertyCount; i++) {
+      var result;
+      var res;
+      try {
+        result = await fetch(
+          `https://api.covalenthq.com/v1/${networkId}/tokens/${propNFTContractAddress}/nft_metadata/${i}/`,
+          requestOptions
+        ).then((response) => response.text());
+        var resultJSON = await JSON.parse(result);
+        console.log({ resultJSON });
+        var metadataURI = resultJSON.data.items[0].nft_data[0].token_url;
+        console.log({ metadataURI });
+        var ipfsLocation = metadataURI.replace(
+          "ipfs://",
+          "https://ipfs.io/ipfs/"
+        );
+        var currProperty = await axios.get(ipfsLocation);
+        var currentPropertyData = currProperty.data;
+
+        //get property data from morter contract
+        var propertyData = await morterContract.methods.allproperties(i).call();
+        var auctionData = await auctionContract.methods.allAuctions(i).call();
+        console.log({ propertyData });
+        console.log({ auctionData });
+        console.log({ currentPropertyData });
+        currentPropertyData["nftContract"] = propNFTContractAddress;
+        currentPropertyData["nftId"] = i;
+        let finalPropertyData = Object.assign(
+          propertyData,
+          auctionData,
+          currentPropertyData
+        );
+        allproperties.push(finalPropertyData);
+      } catch (error) {
+        console.log("error", error);
+      }
+    }
+    setSportList(allproperties);
+    console.log({ allproperties });
+    console.log(JSON.stringify(allproperties));
+  };
 
   function getFilteredList() {
     // Avoid filter when selectedCategory is null
@@ -25,6 +114,14 @@ const PropertyListing = () => {
 
   function handleCategoryChange(event) {
     setSelectedCategory(parseInt(event.target.value));
+  }
+
+  function authenticateUser(user, password) {
+    var token = user + ":" + password;
+    // Base64 Encoding -> btoa
+    var hash = btoa(token);
+
+    return "Basic " + hash;
   }
 
   return (

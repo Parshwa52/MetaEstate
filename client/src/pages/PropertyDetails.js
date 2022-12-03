@@ -54,8 +54,14 @@ const PropertyDetails = () => {
           <div className="container">
             <div className="grid grid-cols-12 mb-[-30px] gap-[30px] xl:gap-[50px]">
               <div className="col-span-12 md:col-span-6 lg:col-span-8 mb-[30px]">
+                <h2
+                  style={{ color: "#083AA9" }}
+                  className="font-lora leading-tight text-[22px] md:text-[28px] lg:text-[36px] text-primary mb-[5px] font-medium"
+                >
+                  {data.name} {"\u00A0"}
+                </h2>{" "}
                 <img
-                  src={data.image}
+                  src={data.image.replace("ipfs://", "https://ipfs.io/ipfs/")}
                   className="w-auto h-auto"
                   loading="lazy"
                   style={{ width: "100%" }}
@@ -67,10 +73,10 @@ const PropertyDetails = () => {
                     style={{ color: "#083AA9" }}
                     className="font-lora leading-tight text-[22px] md:text-[28px] lg:text-[36px] text-primary mb-[5px] font-medium"
                   >
-                    {data.landtype}
+                    {data.metaverseName} {"\u00A0"}
                   </h2>
                   <h3 className="font-light text-[18px] text-secondary underline mb-[20px]">
-                    2265 Paul Wayne Haggerty Road, New Orleans
+                    {data.propertyLocation}
                   </h3>
                   <p style={{ color: "#B2B2B2" }}>{data.description} </p>
                 </div>
@@ -80,177 +86,25 @@ const PropertyDetails = () => {
                 >
                   NFT USP's<span className="text-secondary">.</span>
                 </h4>
-
                 <ul
                   style={{ color: "#B2B2B2" }}
                   className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 px-[15px] mx-[-15px] mt-[40px]"
                 >
-                  <li className="flex flex-wrap items-center mb-[25px]">
-                    <img
-                      className="mr-[15px]"
-                      src="assets/images/about/check.png"
-                      loading="lazy"
-                      alt="icon"
-                      width="20"
-                      height="20"
-                    />
-                    <span>7 Bedrooms</span>
-                  </li>
-                  <li className="flex flex-wrap items-center mb-[25px]">
-                    <img
-                      className="mr-[15px]"
-                      src="assets/images/about/check.png"
-                      loading="lazy"
-                      alt="icon"
-                      width="20"
-                      height="20"
-                    />
-                    <span>Gym for all</span>
-                  </li>
-                  <li className="flex flex-wrap items-center mb-[25px]">
-                    <img
-                      className="mr-[15px]"
-                      src="assets/images/about/check.png"
-                      loading="lazy"
-                      alt="icon"
-                      width="20"
-                      height="20"
-                    />
-                    <span>Air Conditioning</span>
-                  </li>
-                  <li className="flex flex-wrap items-center mb-[25px]">
-                    <img
-                      className="mr-[15px]"
-                      src="assets/images/about/check.png"
-                      loading="lazy"
-                      alt="icon"
-                      width="20"
-                      height="20"
-                    />
-                    <span>CC Camera</span>
-                  </li>
-                  <li className="flex flex-wrap items-center mb-[25px]">
-                    <img
-                      className="mr-[15px]"
-                      src="assets/images/about/check.png"
-                      loading="lazy"
-                      alt="icon"
-                      width="20"
-                      height="20"
-                    />
-                    <span>3 Garaze</span>
-                  </li>
-                  <li className="flex flex-wrap items-center mb-[25px]">
-                    <img
-                      className="mr-[15px]"
-                      src="assets/images/about/check.png"
-                      loading="lazy"
-                      alt="icon"
-                      width="20"
-                      height="20"
-                    />
-                    <span>Cable TV</span>
-                  </li>
-                  <li className="flex flex-wrap items-center mb-[25px]">
-                    <img
-                      className="mr-[15px]"
-                      src="assets/images/about/check.png"
-                      loading="lazy"
-                      alt="icon"
-                      width="20"
-                      height="20"
-                    />
-                    <span>10 Nearby Restaurant</span>
-                  </li>
-                  <li className="flex flex-wrap items-center mb-[25px]">
-                    <img
-                      className="mr-[15px]"
-                      src="assets/images/about/check.png"
-                      loading="lazy"
-                      alt="icon"
-                      width="20"
-                      height="20"
-                    />
-                    <span>Internet</span>
-                  </li>
-                  <li className="flex flex-wrap items-center mb-[25px]">
-                    <img
-                      className="mr-[15px]"
-                      src="assets/images/about/check.png"
-                      loading="lazy"
-                      alt="icon"
-                      width="20"
-                      height="20"
-                    />
-                    <span>Security System</span>
-                  </li>
-                  <li className="flex flex-wrap items-center mb-[25px]">
-                    <img
-                      className="mr-[15px]"
-                      src="assets/images/about/check.png"
-                      loading="lazy"
-                      alt="icon"
-                      width="20"
-                      height="20"
-                    />
-                    <span>10 Nearby Restaurant</span>
-                  </li>
-
-                  <li className="flex flex-wrap items-center mb-[25px]">
-                    <img
-                      className="mr-[15px]"
-                      src="assets/images/about/check.png"
-                      loading="lazy"
-                      alt="icon"
-                      width="20"
-                      height="20"
-                    />
-                    <span>6 Nearby Schools</span>
-                  </li>
-                  <li className="flex flex-wrap items-center mb-[25px]">
-                    <img
-                      className="mr-[15px]"
-                      src="assets/images/about/check.png"
-                      loading="lazy"
-                      alt="icon"
-                      width="20"
-                      height="20"
-                    />
-                    <span>Gym for all</span>
-                  </li>
-                  <li className="flex flex-wrap items-center mb-[25px]">
-                    <img
-                      className="mr-[15px]"
-                      src="assets/images/about/check.png"
-                      loading="lazy"
-                      alt="icon"
-                      width="20"
-                      height="20"
-                    />
-                    <span>Dishwasher</span>
-                  </li>
-                  <li className="flex flex-wrap items-center mb-[25px]">
-                    <img
-                      className="mr-[15px]"
-                      src="assets/images/about/check.png"
-                      loading="lazy"
-                      alt="icon"
-                      width="20"
-                      height="20"
-                    />
-                    <span>5 Balcony</span>
-                  </li>
-                  <li className="flex flex-wrap items-center mb-[25px]">
-                    <img
-                      className="mr-[15px]"
-                      src="assets/images/about/check.png"
-                      loading="lazy"
-                      alt="icon"
-                      width="20"
-                      height="20"
-                    />
-                    <span>Swimming Pool</span>
-                  </li>
+                  {data.usps.map((val, index) => {
+                    return (
+                      <li className="flex flex-wrap items-center mb-[25px]">
+                        <img
+                          className="mr-[15px]"
+                          src="assets/images/about/check.png"
+                          loading="lazy"
+                          alt="icon"
+                          width="20"
+                          height="20"
+                        />
+                        <span>{val}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
                 <h5
                   style={{ color: "#083AA9" }}
@@ -258,7 +112,6 @@ const PropertyDetails = () => {
                 >
                   Floor Plan<span className="text-secondary">.</span>
                 </h5>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-[10px]">
                   <div className="text-center">
                     <img
@@ -276,7 +129,6 @@ const PropertyDetails = () => {
                     <p>1st Floor</p>
                   </div>
                 </div>
-
                 <div className="grid grid-cols-12 mt-[10px]">
                   <div className="col-span-12">
                     <h2

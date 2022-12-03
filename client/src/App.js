@@ -2,15 +2,17 @@ import React, { useState, useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
+import Dashboard from "./pages/Dashboard";
 import HomePage from "./pages/HomePage";
-import PropertyListing from "./pages/PropertyListing";
-import Web3 from "web3";
-import propNFT from "../src/abis/propNFT.json";
-import morter from "../src/abis/morter.json";
-import auction from "../src/abis/Auction.json";
-import BlockchainContext from "../src/contexts/BlockchainContext";
+import ListProperty from "./pages/ListProperty";
 import PropertyDetails from "./pages/PropertyDetails";
-
+import PropertyListing from "./pages/PropertyListing";
+import PropertyMarketplace from "./pages/PropertyMarketplace";
+import Web3 from "web3";
+import propNFT from "./abis/propNFT.json";
+import morter from "./abis/morter.json";
+import auction from "./abis/Auction.json";
+import BlockchainContext from "./contexts/BlockchainContext";
 const getWeb3 = async () => {
   let tempWeb3 = undefined;
   if (window.ethereum) {
@@ -25,7 +27,7 @@ const getWeb3 = async () => {
       //const accounts = await window.web3.eth.getAccounts();
     } catch (error) {
       // User denied account access...
-      alert("User denied access");
+
     }
   }
   // Legacy dapp browsers...
@@ -55,14 +57,17 @@ const App = () => {
     const init = async () => {
       // load web3
       const web3 = await getWeb3();
+      console.log("WEB3-----------");
       console.log({ web3 });
       // loadBlockchainData
       const accounts = await window.ethereum.request({
         method: "eth_requestAccounts",
       });
 
+      console.log("ACCOUNTS-----------");
       console.log({ accounts });
       const networkId = await web3.eth.net.getId();
+      console.log("NetworkId-----------");
       console.log({ networkId });
 
       const listener = (accs) => {
@@ -134,7 +139,14 @@ const App = () => {
         <Routes>
           <Route exact path="/" element={<HomePage />} />
           <Route exact path="/listings" element={<PropertyListing />} />
+          <Route exact path="/add-property" element={<ListProperty />} />
           <Route exact path="/property-details" element={<PropertyDetails />} />
+          <Route exact path="/dashboard" element={<Dashboard />} />
+          <Route
+            exact
+            path="/PropertyMarketplace"
+            element={<PropertyMarketplace />}
+          />
         </Routes>
       </BlockchainContext.Provider>
       <Footer />
