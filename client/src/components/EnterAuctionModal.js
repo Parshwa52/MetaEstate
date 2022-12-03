@@ -124,9 +124,10 @@ export default function EnterAuctionModal({ open, setOpen, data }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(bidAmount);
-
+    console.log(parseInt(parseFloat(bidAmount) * Math.pow(10, 18)));
+    console.log(data.nftId);
     try {
-      await morterContract.methods.bid(data.nftId).send({
+      await auctionContract.methods.bid(data.nftId).send({
         from: accounts[0],
         value: parseInt(parseFloat(bidAmount) * Math.pow(10, 18)),
       });
