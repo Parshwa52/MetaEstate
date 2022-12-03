@@ -55,6 +55,7 @@ contract morter {
     }
 
     //status
+    //0 not listed
     //100) newly listed
     //200) mortgage initiated
     //300) risk free investors invested
@@ -78,6 +79,7 @@ contract morter {
             prop.nftTokenId
         );
         prop.owner = msg.sender;
+        prop.status = 0;
         allproperties[property_id] = prop;
     }
 

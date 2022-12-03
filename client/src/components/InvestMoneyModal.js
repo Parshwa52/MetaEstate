@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -8,6 +8,7 @@ import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import { styled } from "@mui/material/styles";
+import BlockchainContext from "../contexts/BlockchainContext";
 
 const Div = styled("div")(({ theme }) => ({
   ...theme.typography.button,
@@ -48,16 +49,40 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default function InvestMoneyModal({ open, setOpen }) {
+export default function InvestMoneyModal({ open, setOpen ,data}) {
   const [amount, setAmount] = useState("");
-
+  const {
+    web3,
+    accounts,
+    propNFTContract,
+    morterContract,
+    auctionContract,
+    propNFTContractAddress,
+    morterContractAddress,
+    auctionContractAddress,
+  } = useContext(BlockchainContext);
   const handleClose = () => {
     setOpen(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(amount);
+    
+    let finalAmount=parseFloat(amount)*Math.pow(10,18);
+    if(parseInt(data.mortgageamt)<finalAmount)
+    {
+      alert("Please check maximum investment allowed");
+      return;
+    }
+    try{
+      await morterContract.methods.riskfreeinvest(parseInt(data.nftId),parseInt(finalAmount)).send({from:accounts[0],value:parseInt(finalAmount)});
+      alert("Your investment has been made successfully");
+      window.location.reload()
+    }
+    catch(e) {
+      alert(e.message);
+      return;
+    }
   };
 
   return (
@@ -97,6 +122,8 @@ export default function InvestMoneyModal({ open, setOpen }) {
           <br />
           <br />
           <Div>{"The investors are guaranteed annual interest of 3%"}</Div>
+          <br/>
+          <Div>{`The maximum possible investment is : ${parseInt(data.mortgageamt)/Math.pow(10,18)}   `}<i className="fab fa-ethereum"></i></Div>
         </DialogContent>
         <DialogActions>
           <Button

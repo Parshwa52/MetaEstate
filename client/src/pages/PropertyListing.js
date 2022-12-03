@@ -19,7 +19,7 @@ const PropertyListing = () => {
   } = useContext(BlockchainContext);
   let navigate = useNavigate();
   const [sportList, setSportList] = useState([]);
-
+  const [tradingCompany, setTradingCompany] = useState("");
   const [selectedCategory, setSelectedCategory] = useState();
   useEffect(() => {
     //console.log({ web3, accounts, propNFTContract, morterContract, auctionContract, propNFTContractAddress, morterContractAddress, auctionContractAddress });
@@ -41,6 +41,11 @@ const PropertyListing = () => {
     const totalPropertyCount = await morterContract.methods
       .propertycounter()
       .call();
+
+    const tc = await morterContract.methods
+    .tc()
+    .call();
+    setTradingCompany(tc);
     var totalPropertyCountInt = parseInt(totalPropertyCount);
     const networkId = await web3.eth.net.getId();
     var allproperties = [];
@@ -106,11 +111,32 @@ const PropertyListing = () => {
     if (!selectedCategory) {
       return sportList;
     }
-    return sportList.filter((item) => item.category === selectedCategory);
+    else if(selectedCategory===100)
+    {
+      return sportList.filter((item) => parseInt(item.status) === selectedCategory);
+    }
+    else if(selectedCategory===200)
+    {
+      return sportList.filter((item) => parseInt(item.status) === selectedCategory);
+    }
+    else if(selectedCategory===300)
+    {
+      if(accounts[0].toLowerCase()===tradingCompany.toLowerCase())
+      {
+        return sportList.filter((item) => parseInt(item.status) === selectedCategory);
+      }
+    }
+    else if(selectedCategory===400)
+    {
+      sportList.filter((item) => item.mortgager.toString() === accounts[0]);
+    }
+    return [];
   }
 
   // Avoid duplicate function calls with useMemo
   var filteredList = useMemo(getFilteredList, [selectedCategory, sportList]);
+
+  console.log({sportList,filteredList,selectedCategory});
 
   function handleCategoryChange(event) {
     setSelectedCategory(parseInt(event.target.value));
@@ -194,10 +220,11 @@ const PropertyListing = () => {
                     id="category-list"
                     onChange={handleCategoryChange}
                   >
-                    <option value="">All</option>
+                    <option value="0">All</option>
                     <option value="100">Properties listed for sell</option>
                     <option value="200">Mortgage Initiated NFTs</option>
-                    {/* <option value="300">300</option> */}
+                    <option value="300">Risk Free Investors Invested</option>
+                    <option value="400">View your leveraged properties</option>
                   </select>
                 </div>
               </div>
