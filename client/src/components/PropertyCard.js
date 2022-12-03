@@ -71,6 +71,77 @@ const PropertyCard = ({ data }) => {
 
   }
 
+  const tradeByTradingCompany=async(e)=>{
+    e.preventDefault();
+    try {
+      await morterContract.methods.trade(parseInt(data.nftId)).send({
+      from:accounts[0],
+      value: data.mortgageamt.toString()
+    });
+    alert("Trade Done successfully");
+    window.location.reload();
+    } catch (error) {
+      alert(error.message);
+      return
+    }
+  }
+
+  function timeConverter(UNIX_timestamp){ var a = new Date(UNIX_timestamp * 1000); var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; var year = a.getFullYear(); var month = months[a.getMonth()]; var date = a.getDate(); var hour = a.getHours(); var min = a.getMinutes(); var sec = a.getSeconds(); var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ; 
+return time; }
+
+
+  const payEmi=async(e)=>{
+    e.preventDefault();
+   // uint256 property_id, uint256 penaltyAmount
+   let lastEMITimestamp = data.lastEMItimestamp;
+   let firstEmiDone = data.firstEmiDone;
+   let emi_to_be_paid = data.emi_to_be_paid;
+   var totalAmountToBePaid;
+   var penaltyAmount=0;
+   console.log({lastEMITimestamp,firstEmiDone});
+   if(firstEmiDone)
+   {
+      var currdate = new Date();
+      var lastEMIDate = new Date(timeConverter(parseInt(lastEMITimestamp)));
+      const diffTime = Math.abs(currdate - lastEMIDate);
+      const diffDays = diffTime / (1000 * 60 * 60 * 24); 
+      console.log(diffTime + " milliseconds");
+      console.log(diffDays + " days");
+      if(diffDays>30)
+      {
+        var penalty = 0.05*emi_to_be_paid;
+        totalAmountToBePaid = emi_to_be_paid + emi_to_be_paid + penalty;
+        penaltyAmount = totalAmountToBePaid;
+      }
+      else
+      {
+        totalAmountToBePaid = emi_to_be_paid;
+        penaltyAmount=0;
+      }
+
+      console.log(totalAmountToBePaid);
+   }
+   else
+   {
+    totalAmountToBePaid = emi_to_be_paid;
+    penaltyAmount=0;
+   }
+  
+    try {
+      
+      await morterContract.methods.payEmi(parseInt(data.nftId),penaltyAmount).send({
+      from:accounts[0],
+      value: totalAmountToBePaid
+    });
+    alert("EMI Paid Successfully");
+    window.location.reload();
+    
+    } catch (error) {
+      alert(error.message);
+      return
+    }
+  }
+
     
   
 
@@ -174,11 +245,11 @@ const PropertyCard = ({ data }) => {
                 Invest Risk Free
               </button>
             ) : parseInt(data.status) === 300 ? (
-              <button className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all">
+              <button onClick={tradeByTradingCompany} className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all">
                 Initiate Final Trade
               </button>
             ) : parseInt(data.status) === 400 ? (
-              <button className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all">
+              <button onClick={payEmi} className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all">
                 Pay EMI
               </button>):null}
             <br />

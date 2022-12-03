@@ -20,7 +20,7 @@ const PropertyListing = () => {
   let navigate = useNavigate();
   const [sportList, setSportList] = useState([]);
   const [tradingCompany, setTradingCompany] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState();
+  const [selectedCategory, setSelectedCategory] = useState(0);
   useEffect(() => {
     //console.log({ web3, accounts, propNFTContract, morterContract, auctionContract, propNFTContractAddress, morterContractAddress, auctionContractAddress });
     if (morterContract) fetchData();
@@ -108,8 +108,8 @@ const PropertyListing = () => {
 
   function getFilteredList() {
     // Avoid filter when selectedCategory is null
-    if (!selectedCategory) {
-      return sportList;
+    if (selectedCategory===0) {
+      return sportList.filter((item) => parseInt(item.status) === 100 || parseInt(item.status)===200);
     }
     else if(selectedCategory===100)
     {
@@ -128,7 +128,10 @@ const PropertyListing = () => {
     }
     else if(selectedCategory===400)
     {
-      sportList.filter((item) => item.mortgager.toString() === accounts[0]);
+      return sportList.filter((item) =>
+       
+        item.mortgager.toLowerCase() === accounts[0].toLowerCase()
+      );
     }
     return [];
   }
