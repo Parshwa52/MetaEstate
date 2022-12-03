@@ -9,6 +9,8 @@ import propNFT from "../src/abis/propNFT.json";
 import morter from "../src/abis/morter.json";
 import auction from "../src/abis/Auction.json";
 import BlockchainContext from "../src/contexts/BlockchainContext";
+import PropertyDetails from "./pages/PropertyDetails";
+
 const getWeb3 = async () => {
   let tempWeb3 = undefined;
   if (window.ethereum) {
@@ -132,6 +134,7 @@ const App = () => {
         <Routes>
           <Route exact path="/" element={<HomePage />} />
           <Route exact path="/listings" element={<PropertyListing />} />
+          <Route exact path="/property-details" element={<PropertyDetails />} />
         </Routes>
       </BlockchainContext.Provider>
       <Footer />
