@@ -1,4 +1,4 @@
-import React, { useState,useContext } from "react";
+import React, { useState, useContext } from "react";
 import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -49,7 +49,7 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default function InvestMoneyModal({ open, setOpen ,data}) {
+export default function InvestMoneyModal({ open, setOpen, data }) {
   const [amount, setAmount] = useState("");
   const {
     web3,
@@ -67,19 +67,19 @@ export default function InvestMoneyModal({ open, setOpen ,data}) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    let finalAmount=parseFloat(amount)*Math.pow(10,18);
-    if(parseInt(data.mortgageamt)<finalAmount)
-    {
+
+    let finalAmount = parseFloat(amount) * Math.pow(10, 18);
+    if (parseInt(data.mortgageamt) < finalAmount) {
       alert("Please check maximum investment allowed");
       return;
     }
-    try{
-      await morterContract.methods.riskfreeinvest(parseInt(data.nftId),parseInt(finalAmount)).send({from:accounts[0],value:parseInt(finalAmount)});
+    try {
+      await morterContract.methods
+        .riskfreeinvest(parseInt(data.nftId), parseInt(finalAmount))
+        .send({ from: accounts[0], value: parseInt(finalAmount) });
       alert("Your investment has been made successfully");
-      window.location.reload()
-    }
-    catch(e) {
+      window.location.reload();
+    } catch (e) {
       alert(e.message);
       return;
     }
@@ -122,8 +122,13 @@ export default function InvestMoneyModal({ open, setOpen ,data}) {
           <br />
           <br />
           <Div>{"The investors are guaranteed annual interest of 3%"}</Div>
-          <br/>
-          <Div>{`The maximum possible investment is : ${parseInt(data.mortgageamt)/Math.pow(10,18)}   `}<i className="fab fa-ethereum"></i></Div>
+          <br />
+          <Div>
+            {`The maximum possible investment is : ${
+              parseInt(data.mortgageamt) / Math.pow(10, 18)
+            }   `}
+            <i className="fab fa-ethereum"></i>
+          </Div>
         </DialogContent>
         <DialogActions>
           <Button

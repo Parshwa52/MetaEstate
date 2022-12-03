@@ -42,9 +42,7 @@ const PropertyListing = () => {
       .propertycounter()
       .call();
 
-    const tc = await morterContract.methods
-    .tc()
-    .call();
+    const tc = await morterContract.methods.tc().call();
     setTradingCompany(tc);
     var totalPropertyCountInt = parseInt(totalPropertyCount);
     const networkId = await web3.eth.net.getId();
@@ -108,29 +106,27 @@ const PropertyListing = () => {
 
   function getFilteredList() {
     // Avoid filter when selectedCategory is null
-    if (selectedCategory===0) {
-      return sportList.filter((item) => parseInt(item.status) === 100 || parseInt(item.status)===200);
-    }
-    else if(selectedCategory===100)
-    {
-      return sportList.filter((item) => parseInt(item.status) === selectedCategory);
-    }
-    else if(selectedCategory===200)
-    {
-      return sportList.filter((item) => parseInt(item.status) === selectedCategory);
-    }
-    else if(selectedCategory===300)
-    {
-      if(accounts[0].toLowerCase()===tradingCompany.toLowerCase())
-      {
-        return sportList.filter((item) => parseInt(item.status) === selectedCategory);
+    if (selectedCategory === 0) {
+      return sportList.filter(
+        (item) => parseInt(item.status) === 100 || parseInt(item.status) === 200
+      );
+    } else if (selectedCategory === 100) {
+      return sportList.filter(
+        (item) => parseInt(item.status) === selectedCategory
+      );
+    } else if (selectedCategory === 200) {
+      return sportList.filter(
+        (item) => parseInt(item.status) === selectedCategory
+      );
+    } else if (selectedCategory === 300) {
+      if (accounts[0].toLowerCase() === tradingCompany.toLowerCase()) {
+        return sportList.filter(
+          (item) => parseInt(item.status) === selectedCategory
+        );
       }
-    }
-    else if(selectedCategory===400)
-    {
-      return sportList.filter((item) =>
-       
-        item.mortgager.toLowerCase() === accounts[0].toLowerCase()
+    } else if (selectedCategory === 400) {
+      return sportList.filter(
+        (item) => item.mortgager.toLowerCase() === accounts[0].toLowerCase()
       );
     }
     return [];
@@ -139,7 +135,7 @@ const PropertyListing = () => {
   // Avoid duplicate function calls with useMemo
   var filteredList = useMemo(getFilteredList, [selectedCategory, sportList]);
 
-  console.log({sportList,filteredList,selectedCategory});
+  console.log({ sportList, filteredList, selectedCategory });
 
   function handleCategoryChange(event) {
     setSelectedCategory(parseInt(event.target.value));

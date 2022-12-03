@@ -4,8 +4,14 @@ import BlockchainContext from "../contexts/BlockchainContext";
 //import { NFTStorage } from 'nft.storage/dist/bundle.esm.min.js';
 import { NFTStorage, File } from "nft.storage";
 import dotenv from "dotenv";
+import { useLocation } from "react-router-dom";
+
 dotenv.config();
 const ListProperty = () => {
+  let location = useLocation();
+  let isExisting = location.state.isExisting;
+  let data = location.state.data;
+
   const [image, setImage] = useState();
   const {
     web3,
@@ -29,7 +35,16 @@ const ListProperty = () => {
 
   useEffect(() => {
     console.log("from add property");
-    console.log({ web3, accounts, propNFTContract, morterContract, auctionContract, propNFTContractAddress, morterContractAddress, auctionContractAddress });
+    console.log({
+      web3,
+      accounts,
+      propNFTContract,
+      morterContract,
+      auctionContract,
+      propNFTContractAddress,
+      morterContractAddress,
+      auctionContractAddress,
+    });
     const init = async () => {
       const accountsNow = await window.ethereum.request({
         method: "eth_requestAccounts",
@@ -41,6 +56,16 @@ const ListProperty = () => {
     const listener = (accs) => {
       setCurrentAccount(accs[0]);
     };
+    if (isExisting) {
+      setMetaverseName(data.metaverseName);
+      setPropertyTitle(data.name);
+      setPropertyPrice(data.price);
+      setPropertyDescription(data.description);
+      setCoordinateX(data.coordinateX);
+      setcoordinateY(data.coordinateY);
+      setPropertyType(data.propertyType);
+      setPropertyLocation(data.propertyLocation);
+    }
 
     window.ethereum.on("accountsChanged", listener);
   }, []);
@@ -87,7 +112,13 @@ const ListProperty = () => {
         creator: currentAccount,
         category: 100,
         propertyLocation: propertyLocation,
-        usps:["Virtual Property","Secure","Near to beach","Near to shopping mall","Inbuilt casino"]
+        usps: [
+          "Virtual Property",
+          "Secure",
+          "Near to beach",
+          "Near to shopping mall",
+          "Inbuilt casino",
+        ],
       });
 
       console.log(metadata.url);
@@ -189,6 +220,7 @@ const ListProperty = () => {
                     style={{ fontSize: "20px" }}
                     onChange={(e) => setMetaverseName(e.target.value)}
                     required
+                    disabled={isExisting ? true : false}
                   />
                 </div>
                 <div class="mb-[45px] col-span-12 md:col-span-6">
@@ -206,6 +238,7 @@ const ListProperty = () => {
                       placeholder="Property Type"
                       style={{ fontSize: "20px" }}
                       onChange={(e) => setPropertyType(e.target.value)}
+                      disabled={isExisting ? true : false}
                     />
                   </div>
                 </div>
@@ -226,6 +259,7 @@ const ListProperty = () => {
                     placeholder="Property Title"
                     style={{ fontSize: "20px" }}
                     onChange={(e) => setPropertyTitle(e.target.value)}
+                    disabled={isExisting ? true : false}
                   />
                 </div>
 
@@ -263,6 +297,7 @@ const ListProperty = () => {
                     placeholder="Write you description here"
                     style={{ fontSize: "20px" }}
                     onChange={(e) => setPropertyDescription(e.target.value)}
+                    disabled={isExisting ? true : false}
                   ></textarea>
                 </div>
               </div>
@@ -285,6 +320,7 @@ const ListProperty = () => {
                     placeholder="Coordinate-X"
                     style={{ fontSize: "20px" }}
                     onChange={(e) => setCoordinateX(e.target.value)}
+                    disabled={isExisting ? true : false}
                   />
                 </div>
 
@@ -295,6 +331,7 @@ const ListProperty = () => {
                     placeholder="Coordinate-Y"
                     style={{ fontSize: "20px" }}
                     onChange={(e) => setcoordinateY(e.target.value)}
+                    disabled={isExisting ? true : false}
                   />
                 </div>
               </div>
@@ -310,15 +347,10 @@ const ListProperty = () => {
                     placeholder="Metaverse Hyperlink"
                     style={{ fontSize: "20px" }}
                     onChange={(e) => setPropertyLocation(e.target.value)}
+                    disabled={isExisting ? true : false}
                   />
                 </div>
               </div>
-
-
-
-
-
-
 
               <div class="grid grid-cols-12 gap-x-[30px]">
                 <div class="mb-[45px] col-span-12">
@@ -333,6 +365,7 @@ const ListProperty = () => {
                         name="Images"
                         id="Images"
                         onChange={handleImageChange}
+                        disabled={isExisting ? true : false}
                       />
                       <label
                         for="Images"

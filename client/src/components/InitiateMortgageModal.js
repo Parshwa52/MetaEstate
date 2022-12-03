@@ -8,10 +8,8 @@ import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import BlockchainContext from "../contexts/BlockchainContext";
-import { AssistWalkerTwoTone } from "@mui/icons-material";
 function BootstrapDialogTitle(props) {
   const { children, onClose, ...other } = props;
-
 
   return (
     <DialogTitle {...other} style={{ fontSize: "18px", fontWeight: "700" }}>
@@ -40,7 +38,7 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default function InitiateMortgage({ open, setOpen,data }) {
+export default function InitiateMortgage({ open, setOpen, data }) {
   const [amount, setAmount] = useState("");
   const [months, setMonths] = useState("");
   const {
@@ -57,43 +55,39 @@ export default function InitiateMortgage({ open, setOpen,data }) {
     setOpen(false);
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     let emiAmount;
     let rate_of_interest = "7.2"; //pa
-    let roi = parseFloat(parseFloat(rate_of_interest).toFixed(2) / 12).toFixed(2) / 100;
+    let roi =
+      parseFloat(parseFloat(rate_of_interest).toFixed(2) / 12).toFixed(2) / 100;
     // P x R x (1+R)^N / [(1+R)^N-1]
 
     let numerator =
       parseFloat(amount) * roi * Math.pow(1 + roi, parseInt(months));
-    let denominator = parseFloat(
-      Math.pow(1 + roi, parseInt(months)) - 1
-    );
+    let denominator = parseFloat(Math.pow(1 + roi, parseInt(months)) - 1);
     emiAmount = parseFloat(numerator / denominator);
     console.log(emiAmount, numerator, denominator);
 
-    var mortgage_amt = parseFloat(amount)*Math.pow(10,18);
-    var emi = emiAmount * Math.pow(10,18);
+    var mortgage_amt = parseFloat(amount) * Math.pow(10, 18);
+    var emi = emiAmount * Math.pow(10, 18);
     var downPayment = parseFloat(data.propertyPrice).toFixed(2) - mortgage_amt;
-    console.log(emi, numerator, denominator,mortgage_amt,emi,downPayment);
-    try
-    {
-    await morterContract.methods.initiate_mortgage(data.nftId,mortgage_amt,parseInt(emi),parseInt(months)).send(
-      {from:
-          accounts[0],
-          value: parseInt(downPayment)
-      }
-    );
-    alert("Mortgage initiated successfully");
-    window.location.reload();
-    }
-    catch(e)
-    {
+    console.log(emi, numerator, denominator, mortgage_amt, emi, downPayment);
+    try {
+      await morterContract.methods
+        .initiate_mortgage(
+          data.nftId,
+          mortgage_amt,
+          parseInt(emi),
+          parseInt(months)
+        )
+        .send({ from: accounts[0], value: parseInt(downPayment) });
+      alert("Mortgage initiated successfully");
+      window.location.reload();
+    } catch (e) {
       console.log(JSON.stringify(e));
     }
-//uint property_id, uint mortgage_amt,uint _emi,uint interestMonths
-
-
+    //uint property_id, uint mortgage_amt,uint _emi,uint interestMonths
   };
 
   return (

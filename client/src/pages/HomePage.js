@@ -3,9 +3,16 @@ import Web3 from "web3";
 import BlockchainContext from "../contexts/BlockchainContext";
 function Homepage() {
   const [account, setAccounts] = useState("");
-  const { web3, accounts, propNFTContract, morterContract, auctionContract } = useContext(BlockchainContext);
+  const { web3, accounts, propNFTContract, morterContract, auctionContract } =
+    useContext(BlockchainContext);
   useEffect(() => {
-    console.log({ web3, accounts, propNFTContract, morterContract, auctionContract });
+    console.log({
+      web3,
+      accounts,
+      propNFTContract,
+      morterContract,
+      auctionContract,
+    });
   }, []);
   return (
     <div className="root">
@@ -49,9 +56,7 @@ function Homepage() {
             <div className="container mt-[80px] md:mt-[120px] lg:mt-[0px] z-[2] pl-[60px] lg:pl-[50px] 2xl::pl-[0px] lg:absolute lg:left-0 lg:right-0 lg:top-[100%] lg:translate-y-[-396px]">
               <div className="grid grid-cols-12">
                 <div className="col-span-12">
-                  <div className="relative text-center">
-
-                  </div>
+                  <div className="relative text-center"></div>
                 </div>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect , useContext} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import InitiateMortgage from "./InitiateMortgageModal";
 import InvestMoneyModal from "./InvestMoneyModal";
@@ -45,105 +45,119 @@ const PropertyCard = ({ data }) => {
   }, [setMortgageModal]);
   let navigate = useNavigate();
 
-  const buyDirect=async(e)=>{
+  const buyDirect = async (e) => {
     e.preventDefault();
-    if(data.owner.toString().toLowerCase()===accounts[0].toLowerCase())
-    {
+    if (data.owner.toString().toLowerCase() === accounts[0].toLowerCase()) {
       alert("You are already the owner");
       return;
     }
     //5% of tc
-    var payToTC= parseFloat(0.05 * parseInt(data.propertyPrice));
+    var payToTC = parseFloat(0.05 * parseInt(data.propertyPrice));
     var payToSeller = parseInt(data.propertyPrice);
-    var totalValuetoSend = payToSeller+payToTC;
+    var totalValuetoSend = payToSeller + payToTC;
     try {
-      await morterContract.methods.direct_buy_property(data.nftId,payToSeller,payToTC).send({
-      from:accounts[0],
-      value:totalValuetoSend.toString()
-    });
-    alert("Property purchased successfully");
-    window.location.reload();
+      await morterContract.methods
+        .direct_buy_property(data.nftId, payToSeller, payToTC)
+        .send({
+          from: accounts[0],
+          value: totalValuetoSend.toString(),
+        });
+      alert("Property purchased successfully");
+      window.location.reload();
     } catch (error) {
       alert(error.message);
       console.log(JSON.stringify(error));
-      return
+      return;
     }
+  };
 
-  }
-
-  const tradeByTradingCompany=async(e)=>{
+  const tradeByTradingCompany = async (e) => {
     e.preventDefault();
     try {
       await morterContract.methods.trade(parseInt(data.nftId)).send({
-      from:accounts[0],
-      value: data.mortgageamt.toString()
-    });
-    alert("Trade Done successfully");
-    window.location.reload();
+        from: accounts[0],
+        value: data.mortgageamt.toString(),
+      });
+      alert("Trade Done successfully");
+      window.location.reload();
     } catch (error) {
       alert(error.message);
-      return
+      return;
     }
+  };
+
+  function timeConverter(UNIX_timestamp) {
+    var a = new Date(UNIX_timestamp * 1000);
+    var months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    var year = a.getFullYear();
+    var month = months[a.getMonth()];
+    var date = a.getDate();
+    var hour = a.getHours();
+    var min = a.getMinutes();
+    var sec = a.getSeconds();
+    var time =
+      date + " " + month + " " + year + " " + hour + ":" + min + ":" + sec;
+    return time;
   }
 
-  function timeConverter(UNIX_timestamp){ var a = new Date(UNIX_timestamp * 1000); var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; var year = a.getFullYear(); var month = months[a.getMonth()]; var date = a.getDate(); var hour = a.getHours(); var min = a.getMinutes(); var sec = a.getSeconds(); var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ; 
-return time; }
-
-
-  const payEmi=async(e)=>{
+  const payEmi = async (e) => {
     e.preventDefault();
-   // uint256 property_id, uint256 penaltyAmount
-   let lastEMITimestamp = data.lastEMItimestamp;
-   let firstEmiDone = data.firstEmiDone;
-   let emi_to_be_paid = data.emi_to_be_paid;
-   var totalAmountToBePaid;
-   var penaltyAmount=0;
-   console.log({lastEMITimestamp,firstEmiDone});
-   if(firstEmiDone)
-   {
+    // uint256 property_id, uint256 penaltyAmount
+    let lastEMITimestamp = data.lastEMItimestamp;
+    let firstEmiDone = data.firstEmiDone;
+    let emi_to_be_paid = data.emi_to_be_paid;
+    var totalAmountToBePaid;
+    var penaltyAmount = 0;
+    console.log({ lastEMITimestamp, firstEmiDone });
+    if (firstEmiDone) {
       var currdate = new Date();
       var lastEMIDate = new Date(timeConverter(parseInt(lastEMITimestamp)));
       const diffTime = Math.abs(currdate - lastEMIDate);
-      const diffDays = diffTime / (1000 * 60 * 60 * 24); 
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
       console.log(diffTime + " milliseconds");
       console.log(diffDays + " days");
-      if(diffDays>30)
-      {
-        var penalty = 0.05*emi_to_be_paid;
+      if (diffDays > 30) {
+        var penalty = 0.05 * emi_to_be_paid;
         totalAmountToBePaid = emi_to_be_paid + emi_to_be_paid + penalty;
         penaltyAmount = totalAmountToBePaid;
-      }
-      else
-      {
+      } else {
         totalAmountToBePaid = emi_to_be_paid;
-        penaltyAmount=0;
+        penaltyAmount = 0;
       }
 
       console.log(totalAmountToBePaid);
-   }
-   else
-   {
-    totalAmountToBePaid = emi_to_be_paid;
-    penaltyAmount=0;
-   }
-  
+    } else {
+      totalAmountToBePaid = emi_to_be_paid;
+      penaltyAmount = 0;
+    }
+
     try {
-      
-      await morterContract.methods.payEmi(parseInt(data.nftId),penaltyAmount).send({
-      from:accounts[0],
-      value: totalAmountToBePaid
-    });
-    alert("EMI Paid Successfully");
-    window.location.reload();
-    
+      await morterContract.methods
+        .payEmi(parseInt(data.nftId), penaltyAmount)
+        .send({
+          from: accounts[0],
+          value: totalAmountToBePaid,
+        });
+      alert("EMI Paid Successfully");
+      window.location.reload();
     } catch (error) {
       alert(error.message);
-      return
+      return;
     }
-  }
-
-    
-  
+  };
 
   // const { landtype, category, image } = data;
   return (
@@ -155,7 +169,7 @@ return time; }
         >
           <div className="relative">
             <img
-              src={data.image.replace("ipfs://","https://ipfs.io/ipfs/")}
+              src={data.image.replace("ipfs://", "https://ipfs.io/ipfs/")}
               className="w-full h-full"
               loading="lazy"
               width="370"
@@ -202,24 +216,26 @@ return time; }
                 open={investMoneyModal}
                 setOpen={handleClickOpenInvestMoneyModal}
                 data={data}
-
               />
             )}
             {enterAuctionModal && (
               <EnterAuctionModal
                 open={enterAuctionModal}
                 setOpen={handleClickOpenAuctionModal}
+                data={data}
               />
             )}
 
             {data.auctionStarted ? (
-              <button onClick={handleClickOpenAuctionModal} className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all">
+              <button
+                onClick={handleClickOpenAuctionModal}
+                className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all"
+              >
                 Enter the Auction
               </button>
             ) : parseInt(data.status) === 100 ? (
               <div style={{ textAlign: "center" }}>
                 <button
-
                   onClick={buyDirect}
                   style={{
                     display: "inline-block",
@@ -245,13 +261,20 @@ return time; }
                 Invest Risk Free
               </button>
             ) : parseInt(data.status) === 300 ? (
-              <button onClick={tradeByTradingCompany} className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all">
+              <button
+                onClick={tradeByTradingCompany}
+                className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all"
+              >
                 Initiate Final Trade
               </button>
             ) : parseInt(data.status) === 400 ? (
-              <button onClick={payEmi} className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all">
+              <button
+                onClick={payEmi}
+                className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all"
+              >
                 Pay EMI
-              </button>):null}
+              </button>
+            ) : null}
             <br />
             <span style={{ fontSize: "18px", fontWeight: "500" }}>
               Created on: 4 December, 2022
@@ -302,14 +325,15 @@ return time; }
                 {data.nftContract.slice(-4)}
               </li>
               <li className="flex flex-wrap items-center">
-                [{data.coordinateX}]{"\u00A0"}:{"\u00A0"}[
-                {data.coordinateY}]
+                [{data.coordinateX}]{"\u00A0"}:{"\u00A0"}[{data.coordinateY}]
               </li>
             </ul>
             <ul>
               <li className="flex flex-wrap items-center justify-between">
                 <span className="font-lora text-base text-primary leading-none font-medium">
-                  Price: {parseFloat(parseInt(data.propertyPrice)/Math.pow(10,18))} <i className="fab fa-ethereum"></i>{" "}
+                  Price:{" "}
+                  {parseFloat(parseInt(data.propertyPrice) / Math.pow(10, 18))}{" "}
+                  <i className="fab fa-ethereum"></i>{" "}
                 </span>
               </li>
             </ul>
