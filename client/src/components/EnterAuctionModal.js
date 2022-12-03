@@ -49,6 +49,8 @@ function createData(name, code, population, size) {
   return { name, code, population, size, density };
 }
 
+
+
 const rows = [
   createData("India", "IN", 1324171354, 3287263),
   createData("China", "CN", 1403500365, 9596961),
@@ -128,6 +130,7 @@ export default function EnterAuctionModal({ open, setOpen, data }) {
         from: accounts[0],
         value: parseInt(parseFloat(bidAmount) * Math.pow(10, 18)),
       });
+      alert("Bid Submitted Successfully");
       window.location.reload();
     } catch (e) {
       alert(e.message);
@@ -164,6 +167,7 @@ export default function EnterAuctionModal({ open, setOpen, data }) {
         >
           Participate in Bidding to buy your favourite NFTs{" "}
         </BootstrapDialogTitle>
+        <p>{data.highestBid}</p>
         <DialogContent>
           <h5
             style={{ color: "white", marginBottom: "7px" }}

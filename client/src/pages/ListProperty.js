@@ -34,7 +34,7 @@ const ListProperty = () => {
   const [propertyLocation, setPropertyLocation] = useState("");
 
   useEffect(() => {
-    console.log("from add property");
+    console.log("from add property",data,isExisting);
     console.log({
       web3,
       accounts,
@@ -50,12 +50,10 @@ const ListProperty = () => {
         method: "eth_requestAccounts",
       });
       setCurrentAccount(accountsNow[0]);
+      
     };
     init();
-
-    const listener = (accs) => {
-      setCurrentAccount(accs[0]);
-    };
+    
     if (isExisting) {
       setMetaverseName(data.metaverseName);
       setPropertyTitle(data.name);
@@ -66,6 +64,11 @@ const ListProperty = () => {
       setPropertyType(data.propertyType);
       setPropertyLocation(data.propertyLocation);
     }
+
+    const listener = (accs) => {
+      setCurrentAccount(accs[0]);
+    };
+   
 
     window.ethereum.on("accountsChanged", listener);
   }, []);
@@ -220,6 +223,7 @@ const ListProperty = () => {
                     style={{ fontSize: "20px" }}
                     onChange={(e) => setMetaverseName(e.target.value)}
                     required
+                    value={metaverseName}
                     disabled={isExisting ? true : false}
                   />
                 </div>
@@ -239,6 +243,7 @@ const ListProperty = () => {
                       style={{ fontSize: "20px" }}
                       onChange={(e) => setPropertyType(e.target.value)}
                       disabled={isExisting ? true : false}
+                      value={propertyType}
                     />
                   </div>
                 </div>
@@ -260,6 +265,7 @@ const ListProperty = () => {
                     style={{ fontSize: "20px" }}
                     onChange={(e) => setPropertyTitle(e.target.value)}
                     disabled={isExisting ? true : false}
+                    value={propertyTitle}
                   />
                 </div>
 
@@ -276,6 +282,7 @@ const ListProperty = () => {
                     class=" w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
                     type="text"
                     placeholder="Price(inETH)"
+                    value={parseInt(propertyPrice)/Math.pow(10,18)}
                     onChange={(e) => setPropertyPrice(e.target.value)}
                   />
                 </div>
@@ -298,6 +305,7 @@ const ListProperty = () => {
                     style={{ fontSize: "20px" }}
                     onChange={(e) => setPropertyDescription(e.target.value)}
                     disabled={isExisting ? true : false}
+                    value={propertyDescription}
                   ></textarea>
                 </div>
               </div>
@@ -320,6 +328,7 @@ const ListProperty = () => {
                     placeholder="Coordinate-X"
                     style={{ fontSize: "20px" }}
                     onChange={(e) => setCoordinateX(e.target.value)}
+                    value={coordinateX}
                     disabled={isExisting ? true : false}
                   />
                 </div>
@@ -331,6 +340,7 @@ const ListProperty = () => {
                     placeholder="Coordinate-Y"
                     style={{ fontSize: "20px" }}
                     onChange={(e) => setcoordinateY(e.target.value)}
+                    value={coordinateY}
                     disabled={isExisting ? true : false}
                   />
                 </div>
@@ -347,6 +357,7 @@ const ListProperty = () => {
                     placeholder="Metaverse Hyperlink"
                     style={{ fontSize: "20px" }}
                     onChange={(e) => setPropertyLocation(e.target.value)}
+                    value={propertyLocation}
                     disabled={isExisting ? true : false}
                   />
                 </div>

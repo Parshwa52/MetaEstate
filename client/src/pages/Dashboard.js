@@ -76,7 +76,7 @@ export default function Dashboard() {
       //get property data from morter contract
       var propertyData = await morterContract.methods.allproperties(i).call();
       var auctionData = await auctionContract.methods.allAuctions(i).call();
-      if (propertyData.owner === accounts[0]) {
+      if (propertyData.owner.toLowerCase() === accounts[0].toLowerCase()) {
         console.log(propertyData);
         console.log(auctionData);
         console.log(currProperty);
@@ -89,6 +89,7 @@ export default function Dashboard() {
         );
         allproperties.push(finalPropertyData);
       }
+      console.log(allproperties);
     }
     Setmyprojects(allproperties);
   };
@@ -102,8 +103,9 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
+    if (morterContract)
     fetchData();
-  }, []);
+  }, [accounts]);
   return (
     <>
       <section

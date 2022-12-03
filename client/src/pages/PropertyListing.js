@@ -129,6 +129,12 @@ const PropertyListing = () => {
         (item) => item.mortgager.toLowerCase() === accounts[0].toLowerCase()
       );
     }
+    else if(selectedCategory===500)
+    {
+      return sportList.filter(
+        (item) => item.auctionStarted === true
+      );
+    }
     return [];
   }
 
@@ -224,6 +230,7 @@ const PropertyListing = () => {
                     <option value="200">Mortgage Initiated NFTs</option>
                     <option value="300">Risk Free Investors Invested</option>
                     <option value="400">View your leveraged properties</option>
+                    <option value="500">Properties in Auction</option>
                   </select>
                 </div>
               </div>

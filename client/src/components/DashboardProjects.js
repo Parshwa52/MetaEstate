@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useState,useContext } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
@@ -6,9 +6,18 @@ import "./DashboardProjectStyles.css";
 import Button from "@mui/material/Button";
 import BlockchainContext from "../contexts/BlockchainContext";
 import { useNavigate } from "react-router-dom";
+import DashboardAuctionModal from './DashboardAuctionModal';
 
 export default function DashboardProjects({ data }) {
   let navigate = useNavigate();
+  const [enterAuctionModal, setEnterAuctionModal] = useState(false);
+
+  const [auctionStatus, setAuctionStatus] = useState(true);
+
+
+  const handleClickOpenAuctionModal = () => {
+    setEnterAuctionModal(!enterAuctionModal);
+  };
   const {
     web3,
     accounts,
@@ -20,8 +29,22 @@ export default function DashboardProjects({ data }) {
     auctionContractAddress,
   } = useContext(BlockchainContext);
 
+  const sellNFT = ()=> {
+    if(parseInt(data.status)===200 && parseInt(data.status)===300)
+    {
+      alert("Cannot sell the NFT");
+      return;
+    }
+    navigate("/add-property", {
+      state: { isExisting: true, data: data },
+    })
+  }
+
   return (
     <>
+    { enterAuctionModal && (
+      <DashboardAuctionModal open={enterAuctionModal} setOpen={handleClickOpenAuctionModal} data={data}/>)
+    }
       <Card
         sx={{ maxWidth: 345 }}
         style={{
@@ -68,16 +91,14 @@ export default function DashboardProjects({ data }) {
               <Button
                 variant="contained"
                 style={{ marginRight: "10px" }}
-                onClick={() =>
-                  navigate("/add-property", {
-                    state: { isExisting: true, data: data },
-                  })
+                onClick={
+                  sellNFT
                 }
                 className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block  relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all"
               >
                 Sell
               </Button>{" "}
-              <Button className="button01" variant="contained">
+              <Button className="button01" variant="contained" onClick={handleClickOpenAuctionModal}>
                 Auction
               </Button>
             </span>
