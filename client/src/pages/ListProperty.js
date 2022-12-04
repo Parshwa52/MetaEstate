@@ -206,31 +206,50 @@ const ListProperty = () => {
         .send({
           from: currentAccount,
         })
-        .then(() => {
-          makeManyTxs();
-        });
-      // .then(async (result) => {
-      //   console.log({ result });
-      //   //console.log(propNFTContract.methods._tokenIds().call());
-      //   var tokenId = await propNFTContract.methods._tokenIds().call();
-      //   //console.log({ morterContractAddress });
-      //   //console.log({ tokenId });
-      //   var currentTokenId = parseInt(tokenId) - 1;
-      //   //console.log({ currentTokenId });
-      //   await propNFTContract.methods
-      //     .approveContract(morterContractAddress, currentTokenId)
-      //     .send({
-      //       from: currentAccount,
-      //     });
+        .then(async (result) => {
+          console.log({ result });
+          //console.log(propNFTContract.methods._tokenIds().call());
+          var tokenId = await propNFTContract.methods._tokenIds().call();
+          //console.log({ morterContractAddress });
+          //console.log({ tokenId });
+          var currentTokenId = parseInt(tokenId) - 1;
+          //console.log({ currentTokenId });
+          await propNFTContract.methods
+            .approveContract(morterContractAddress, currentTokenId)
+            .send({
+              from: currentAccount,
+            });
 
-      //   return currentTokenId;
-      // })
-      // .then((tokenId) => {
-      //   //console.log({ tokenId });
-      //   morterContract.methods.listProperty(priceInWei, tokenId).send({
-      //     from: currentAccount,
-      //   });
-      // });
+          return currentTokenId;
+        })
+        .then((tokenId) => {
+          //console.log({ tokenId });
+          morterContract.methods.listProperty(priceInWei, tokenId).send({
+            from: currentAccount,
+          });
+        })
+        .then(async (result) => {
+          console.log({ result });
+          //console.log(propNFTContract.methods._tokenIds().call());
+          var tokenId = await propNFTContract.methods._tokenIds().call();
+          //console.log({ morterContractAddress });
+          //console.log({ tokenId });
+          var currentTokenId = parseInt(tokenId) - 1;
+          //console.log({ currentTokenId });
+          await propNFTContract.methods
+            .approveContract(morterContractAddress, currentTokenId)
+            .send({
+              from: currentAccount,
+            });
+
+          return currentTokenId;
+        })
+        .then((tokenId) => {
+          //console.log({ tokenId });
+          morterContract.methods.listProperty(priceInWei, tokenId).send({
+            from: currentAccount,
+          });
+        });
     };
   };
 
