@@ -59,7 +59,7 @@ const Header = () => {
                       fontWeight: "700",
                     }}
                   >
-                    HomeLand
+                    MetaEstate
                   </a>
                   <nav
                     className="flex flex-wrap items-center"

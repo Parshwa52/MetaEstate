@@ -5,12 +5,17 @@ import BlockchainContext from "../contexts/BlockchainContext";
 import { NFTStorage, File } from "nft.storage";
 import dotenv from "dotenv";
 import { useLocation } from "react-router-dom";
-
+import axios from "axios";
+import ipfsClient from "ipfs-http-client";
+//const ipfsClient = require('ipfs-http-client');
+const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https',apiPath: '/ipfs/api/v0'  });
 dotenv.config();
 const ListProperty = () => {
   let location = useLocation();
-  let isExisting = location.state.isExisting;
-  let data = location.state.data;
+
+  console.log({location});
+  let isExisting = location.state===null?false:location.state.isExisting;
+  let data = location.state===null?{"a":"a"}:location.state.data;
 
   const [image, setImage] = useState();
   const {
@@ -32,7 +37,11 @@ const ListProperty = () => {
   const [coordinateY, setcoordinateY] = useState(0);
   const [propertyType, setPropertyType] = useState("");
   const [propertyLocation, setPropertyLocation] = useState("");
-
+  const [videoBlob, setVideoBlob] = useState("");
+  const [filetoupload, setFileToUpload] = useState("");
+  const [binaryFile, setBinaryFile] = useState();
+  const [uploadurls, setUploadUrls] = useState();
+  const [assetID, setAssetId] = useState();
   useEffect(() => {
     console.log("from add property",data,isExisting);
     console.log({
@@ -72,6 +81,28 @@ const ListProperty = () => {
 
     window.ethereum.on("accountsChanged", listener);
   }, []);
+
+  const uploadVideo=async()=>{
+   
+  
+    //alert("hellooooooo");
+    console.log("Submitting file to IPFS...");
+  
+    console.log({filetoupload});
+  
+    await ipfs.add(filetoupload,(error,result)=>{
+      if(error)
+      {
+          alert("Error in uploading");
+      }
+      else
+      {
+        console.log("ipfs hash",result);
+        alert("Your thumbnail is successfully uploaded");
+      }
+    })
+  }
+  
 
   const mintNFT = async () => {
     const apiKey = process.env.REACT_APP_NFT_STORAGE_API_KEY;
@@ -115,6 +146,7 @@ const ListProperty = () => {
         creator: currentAccount,
         category: 100,
         propertyLocation: propertyLocation,
+        video: "ipfs://QmWhKnEXbniphokV8bNg6NNSFazFESPaXoCzrMyNYzMvWW",
         usps: [
           "Virtual Property",
           "Secure",
@@ -130,35 +162,53 @@ const ListProperty = () => {
       //First mint nft from propNFT
       //approve morter and auction contract for this nft
       //List the nft via morter list
-      await propNFTContract.methods
-        .mintandApproveNFT(accounts[0], metadata.url.toString())
-        .send({
-          from: currentAccount,
-        })
-        .then(async (result) => {
-          console.log({ result });
-          //console.log(propNFTContract.methods._tokenIds().call());
-          var tokenId = await propNFTContract.methods._tokenIds().call();
-          //console.log({ morterContractAddress });
-          //console.log({ tokenId });
-          var currentTokenId = parseInt(tokenId) - 1;
-          //console.log({ currentTokenId });
+
+     
           await propNFTContract.methods
-            .approveContract(morterContractAddress, currentTokenId)
-            .send({
+          .mintandApproveNFT(accounts[0], metadata.url.toString())
+          .send({
+            from: currentAccount,
+          })
+          .then(async (result) => {
+            console.log({ result });
+            //console.log(propNFTContract.methods._tokenIds().call());
+            var tokenId = await propNFTContract.methods._tokenIds().call();
+            //console.log({ morterContractAddress });
+            //console.log({ tokenId });
+            var currentTokenId = parseInt(tokenId) - 1;
+            //console.log({ currentTokenId });
+            await propNFTContract.methods
+              .approveContract(morterContractAddress, currentTokenId)
+              .send({
+                from: currentAccount,
+              });
+  
+            return currentTokenId;
+          })
+          .then((tokenId) => {
+            //console.log({ tokenId });
+            morterContract.methods.listProperty(priceInWei, tokenId).send({
               from: currentAccount,
             });
-
-          return currentTokenId;
-        })
-        .then((tokenId) => {
-          //console.log({ tokenId });
-          morterContract.methods.listProperty(priceInWei, tokenId).send({
-            from: currentAccount,
           });
-        });
+      
+     
     };
   };
+
+  const captureVideoFile=async(event)=>{
+    event.preventDefault();
+    const file=event.target.files[0];
+    await setFileToUpload(file);
+    //var blob = new Blob([file],{"type" : "video\/mp4"});
+    //console.log({blob});
+    //await setVideoBlob(blob);
+  }
+
+
+
+  
+  
 
   const handleChange = (e) => {
     e.preventDefault();
@@ -402,11 +452,51 @@ const ListProperty = () => {
                   </div>
                 </div>
               </div>
+
+
+              <div class="grid grid-cols-12 gap-x-[30px]">
+                <div class="mb-[45px] col-span-12">
+                  <label class="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary">
+                    Add Video
+                  </label>
+                  <div class="py-[35px] px-[15px] flex flex-wrap items-center justify-center text-center border border-[#1B2D40] border-opacity-60 rounded-[8px]">
+                    <div class="relative">
+                      <input
+                        class="absolute inset-0 z-[0] opacity-0 w-full"
+                        type="file"
+                        name="Videos"
+                        id="Videos"
+                        onChange={captureVideoFile}
+                        disabled={isExisting ? true : false}
+                      />
+                      <label
+                        for="Videos"
+                        class="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[30px] py-[12px] capitalize font-medium text-white text-[14px] xl:text-[16px] relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all flex flex-wrap items-center justify-center cursor-pointer"
+                      >
+                        {" "}
+                        <svg
+                          class="mr-[5px]"
+                          width="22"
+                          height="22"
+                          viewBox="0 0 22 22"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M21.5853 8.39666C21.4868 8.25357 21.3542 8.1373 21.1995 8.05834C21.0448 7.97938 20.8729 7.94023 20.6992 7.94444H6.82698C6.53428 7.95684 6.25076 8.05025 6.00799 8.21425C5.76523 8.37825 5.57275 8.60641 5.45198 8.87333C5.44998 8.90181 5.44998 8.9304 5.45198 8.95888L3.66753 15.2778V4.27777H7.63365L9.22865 6.47166C9.28554 6.54951 9.36004 6.6128 9.44607 6.65635C9.53211 6.69989 9.62722 6.72246 9.72365 6.72221H19.5564C19.5564 6.39806 19.4277 6.08718 19.1984 5.85797C18.9692 5.62876 18.6584 5.49999 18.3342 5.49999H10.0353L8.62365 3.55666C8.50987 3.40095 8.36085 3.27438 8.18879 3.18728C8.01673 3.10019 7.8265 3.05505 7.63365 3.05555H3.66753C3.34338 3.05555 3.0325 3.18432 2.80329 3.41353C2.57408 3.64274 2.44531 3.95361 2.44531 4.27777V18.1439C2.45485 18.3638 2.55062 18.5711 2.71189 18.721C2.87316 18.8708 3.08695 18.9511 3.30698 18.9444H18.542C18.6783 18.9499 18.8126 18.9095 18.9234 18.8297C19.0341 18.75 19.115 18.6355 19.1531 18.5044L21.7136 9.27666C21.7614 9.12999 21.7747 8.97428 21.7524 8.82164C21.7302 8.66901 21.673 8.52357 21.5853 8.39666ZM18.0592 17.7222H4.21753L6.58865 9.28277C6.64651 9.20822 6.72869 9.15632 6.82087 9.1361H20.467L18.0592 17.7222Z"
+                            fill="#FAFAFA"
+                          />
+                        </svg>{" "}
+                        Add Video
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </form>
           </div>
         </div>
         {/* <!-- create agency End--> */}
-
         <div align="center">
           <div class="container">
             <button

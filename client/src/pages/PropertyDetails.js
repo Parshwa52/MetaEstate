@@ -1,6 +1,9 @@
+import { Button } from "@mui/material";
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+
+import { useLocation,useNavigate } from "react-router-dom";
 const PropertyDetails = () => {
+  let navigate=useNavigate();
   let location = useLocation();
   const [data, setData] = useState(location.state.data);
   return (
@@ -110,9 +113,10 @@ const PropertyDetails = () => {
                   style={{ color: "#083AA9" }}
                   className="font-lora text-primary text-[24px] sm:text-[28px] leading-[1.277] capitalize lg:mt-[25px] mb-[40px] font-medium"
                 >
-                  Floor Plan<span className="text-secondary">.</span>
+                  Video Sample<span className="text-secondary">.</span>
                 </h5>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-[10px]">
+                <Button onClick={()=>navigate('/video',{location:{data:data.video}})}>Check Video</Button>
+                {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-[10px]">
                   <div className="text-center">
                     <img
                       src="assets/images/floor-plan/floor1.png"
@@ -128,7 +132,7 @@ const PropertyDetails = () => {
                     />
                     <p>1st Floor</p>
                   </div>
-                </div>
+                </div> */}
                 <div className="grid grid-cols-12 mt-[10px]">
                   <div className="col-span-12">
                     <h2
