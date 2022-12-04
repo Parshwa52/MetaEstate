@@ -1,16 +1,18 @@
-import { createChainedFunction } from "@mui/material";
 import React, { useEffect, useState, useContext } from "react";
 import BlockchainContext from "../contexts/BlockchainContext";
 //import { NFTStorage } from 'nft.storage/dist/bundle.esm.min.js';
 import { NFTStorage, File } from "nft.storage";
 import dotenv from "dotenv";
 import { useLocation } from "react-router-dom";
+import { ethers } from "ethers";
+import { ChainId } from "@biconomy/core-types";
+import SmartAccount from "@biconomy/smart-account";
 
 dotenv.config();
 const ListProperty = () => {
   let location = useLocation();
-  let isExisting = location.state.isExisting;
-  let data = location.state.data;
+  let isExisting = location.state ? location.state.isExisting : false;
+  let data = location.state ? location.state.data : null;
 
   const [image, setImage] = useState();
   const {
@@ -33,8 +35,79 @@ const ListProperty = () => {
   const [propertyType, setPropertyType] = useState("");
   const [propertyLocation, setPropertyLocation] = useState("");
 
+  // eslint-disable-next-line no-undef
+  // const { provider, address } = useWeb3AuthContext();
+  const walletProvider = new ethers.providers.Web3Provider(window.ethereum);
+  // Initialize the Smart Account
+
+  // Init Smart account instance
+
+  const makeManyTxs = async () => {
+    const walletProvider = new web3.providers.Web3Provider(window.ethereum);
+
+    // Initialize the Smart Account
+
+    let options = {
+      activeNetworkId: ChainId.POLYGON_MUMBAI,
+      supportedNetworksIds: [
+        ChainId.GOERLI,
+        ChainId.POLYGON_MAINNET,
+        ChainId.POLYGON_MUMBAI,
+      ],
+    };
+
+    let smartAccount = new SmartAccount(walletProvider, options);
+    smartAccount = await smartAccount.init();
+    const txs = [];
+
+    let tokenId = await propNFTContract.methods._tokenIds().call();
+    //console.log({ morterContractAddress });
+    //console.log({ tokenId });
+    let currentTokenId = parseInt(tokenId) - 1;
+
+    const interface1 = new ethers.utils.Interface([
+      "function approveContract(address contractToApprove,uint tokenId)",
+    ]);
+    const data1 = interface1.encodeFunctionData("approveContract", [
+      propNFTContractAddress.toString(),
+      parseInt(currentTokenId),
+    ]);
+
+    const tx1 = {
+      to: interface1,
+      data: data1,
+    };
+
+    txs.push(tx1);
+
+    var priceInWei = await web3.utils
+      .toBN(web3.utils.toWei(propertyPrice.toString(), "ether"))
+      .toString();
+
+    const interface2 = new ethers.utils.Interface([
+      "function listProperty(uint256 _price, uint256 tokenId)",
+    ]);
+    const data2 = interface2.encodeFunctionData("listProperty", [
+      parseInt(priceInWei),
+      parseInt(currentTokenId),
+    ]);
+
+    const tx2 = {
+      to: interface2,
+      data: data2,
+    };
+
+    txs.push(tx2);
+
+    const response = await smartAccount.sendGaslessTransactionBatch({
+      transactions: txs,
+    });
+    console.log(response);
+    console.log(`Transaction sent: ${response.hash}`);
+  };
+
   useEffect(() => {
-    console.log("from add property",data,isExisting);
+    console.log("from add property", data, isExisting);
     console.log({
       web3,
       accounts,
@@ -50,10 +123,9 @@ const ListProperty = () => {
         method: "eth_requestAccounts",
       });
       setCurrentAccount(accountsNow[0]);
-      
     };
     init();
-    
+
     if (isExisting) {
       setMetaverseName(data.metaverseName);
       setPropertyTitle(data.name);
@@ -68,7 +140,6 @@ const ListProperty = () => {
     const listener = (accs) => {
       setCurrentAccount(accs[0]);
     };
-   
 
     window.ethereum.on("accountsChanged", listener);
   }, []);
@@ -135,33 +206,32 @@ const ListProperty = () => {
         .send({
           from: currentAccount,
         })
-        .then(async (result) => {
-          console.log({ result });
-          //console.log(propNFTContract.methods._tokenIds().call());
-          var tokenId = await propNFTContract.methods._tokenIds().call();
-          //console.log({ morterContractAddress });
-          //console.log({ tokenId });
-          var currentTokenId = parseInt(tokenId) - 1;
-          //console.log({ currentTokenId });
-          await propNFTContract.methods
-            .approveContract(morterContractAddress, currentTokenId)
-            .send({
-              from: currentAccount,
-            });
-
-          return currentTokenId;
-        })
-        .then((tokenId) => {
-          //console.log({ tokenId });
-          morterContract.methods.listProperty(priceInWei, tokenId).send({
-            from: currentAccount,
-          });
+        .then(() => {
+          makeManyTxs();
         });
-    };
-  };
+      // .then(async (result) => {
+      //   console.log({ result });
+      //   //console.log(propNFTContract.methods._tokenIds().call());
+      //   var tokenId = await propNFTContract.methods._tokenIds().call();
+      //   //console.log({ morterContractAddress });
+      //   //console.log({ tokenId });
+      //   var currentTokenId = parseInt(tokenId) - 1;
+      //   //console.log({ currentTokenId });
+      //   await propNFTContract.methods
+      //     .approveContract(morterContractAddress, currentTokenId)
+      //     .send({
+      //       from: currentAccount,
+      //     });
 
-  const handleChange = (e) => {
-    e.preventDefault();
+      //   return currentTokenId;
+      // })
+      // .then((tokenId) => {
+      //   //console.log({ tokenId });
+      //   morterContract.methods.listProperty(priceInWei, tokenId).send({
+      //     from: currentAccount,
+      //   });
+      // });
+    };
   };
 
   const handleImageChange = (e) => {
@@ -282,7 +352,11 @@ const ListProperty = () => {
                     class=" w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
                     type="text"
                     placeholder="Price(inETH)"
-                    value={parseInt(propertyPrice)/Math.pow(10,18)}
+                    value={
+                      isExisting
+                        ? parseInt(propertyPrice) / Math.pow(10, 18)
+                        : propertyPrice
+                    }
                     onChange={(e) => setPropertyPrice(e.target.value)}
                   />
                 </div>
