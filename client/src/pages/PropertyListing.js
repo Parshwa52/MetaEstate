@@ -38,6 +38,8 @@ const PropertyListing = () => {
 
   const fetchData = async () => {
     console.log({ morterContract });
+    console.log({morterContractAddress});
+    
     const totalPropertyCount = await morterContract.methods
       .propertycounter()
       .call();

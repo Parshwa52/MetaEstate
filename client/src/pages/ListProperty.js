@@ -7,9 +7,10 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import ipfsClient from "ipfs-http-client";
 //const ipfsClient = require('ipfs-http-client');
-const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https',apiPath: '/ipfs/api/v0'  });import { ethers } from "ethers";
-import { ChainId } from "@biconomy/core-types";
-import SmartAccount from "@biconomy/smart-account";
+const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https',apiPath: '/ipfs/api/v0'  });
+// import { ethers } from "ethers";
+// import { ChainId } from "@biconomy/core-types";
+// import SmartAccount from "@biconomy/smart-account";
 
 dotenv.config();
 const ListProperty = () => {
@@ -44,73 +45,73 @@ const ListProperty = () => {
   const [assetID, setAssetId] = useState();
   // eslint-disable-next-line no-undef
   // const { provider, address } = useWeb3AuthContext();
-  const walletProvider = new ethers.providers.Web3Provider(window.ethereum);
+  // const walletProvider = new ethers.providers.Web3Provider(window.ethereum);
   // Initialize the Smart Account
 
   // Init Smart account instance
 
   const makeManyTxs = async () => {
-    const walletProvider = new web3.providers.Web3Provider(window.ethereum);
+    // const walletProvider = new web3.providers.Web3Provider(window.ethereum);
 
-    // Initialize the Smart Account
+    // // Initialize the Smart Account
 
-    let options = {
-      activeNetworkId: ChainId.POLYGON_MUMBAI,
-      supportedNetworksIds: [
-        ChainId.GOERLI,
-        ChainId.POLYGON_MAINNET,
-        ChainId.POLYGON_MUMBAI,
-      ],
-    };
+    // let options = {
+    //   activeNetworkId: ChainId.POLYGON_MUMBAI,
+    //   supportedNetworksIds: [
+    //     ChainId.GOERLI,
+    //     ChainId.POLYGON_MAINNET,
+    //     ChainId.POLYGON_MUMBAI,
+    //   ],
+    // };
 
-    let smartAccount = new SmartAccount(walletProvider, options);
-    smartAccount = await smartAccount.init();
-    const txs = [];
+    // let smartAccount = new SmartAccount(walletProvider, options);
+    // smartAccount = await smartAccount.init();
+    // const txs = [];
 
-    let tokenId = await propNFTContract.methods._tokenIds().call();
-    //console.log({ morterContractAddress });
-    //console.log({ tokenId });
-    let currentTokenId = parseInt(tokenId) - 1;
+    // let tokenId = await propNFTContract.methods._tokenIds().call();
+    // //console.log({ morterContractAddress });
+    // //console.log({ tokenId });
+    // let currentTokenId = parseInt(tokenId) - 1;
 
-    const interface1 = new ethers.utils.Interface([
-      "function approveContract(address contractToApprove,uint tokenId)",
-    ]);
-    const data1 = interface1.encodeFunctionData("approveContract", [
-      propNFTContractAddress.toString(),
-      parseInt(currentTokenId),
-    ]);
+    // const interface1 = new ethers.utils.Interface([
+    //   "function approveContract(address contractToApprove,uint tokenId)",
+    // ]);
+    // const data1 = interface1.encodeFunctionData("approveContract", [
+    //   propNFTContractAddress.toString(),
+    //   parseInt(currentTokenId),
+    // ]);
 
-    const tx1 = {
-      to: interface1,
-      data: data1,
-    };
+    // const tx1 = {
+    //   to: interface1,
+    //   data: data1,
+    // };
 
-    txs.push(tx1);
+    // txs.push(tx1);
 
-    var priceInWei = await web3.utils
-      .toBN(web3.utils.toWei(propertyPrice.toString(), "ether"))
-      .toString();
+    // var priceInWei = await web3.utils
+    //   .toBN(web3.utils.toWei(propertyPrice.toString(), "ether"))
+    //   .toString();
 
-    const interface2 = new ethers.utils.Interface([
-      "function listProperty(uint256 _price, uint256 tokenId)",
-    ]);
-    const data2 = interface2.encodeFunctionData("listProperty", [
-      parseInt(priceInWei),
-      parseInt(currentTokenId),
-    ]);
+    // const interface2 = new ethers.utils.Interface([
+    //   "function listProperty(uint256 _price, uint256 tokenId)",
+    // ]);
+    // const data2 = interface2.encodeFunctionData("listProperty", [
+    //   parseInt(priceInWei),
+    //   parseInt(currentTokenId),
+    // ]);
 
-    const tx2 = {
-      to: interface2,
-      data: data2,
-    };
+    // const tx2 = {
+    //   to: interface2,
+    //   data: data2,
+    // };
 
-    txs.push(tx2);
+    // txs.push(tx2);
 
-    const response = await smartAccount.sendGaslessTransactionBatch({
-      transactions: txs,
-    });
-    console.log(response);
-    console.log(`Transaction sent: ${response.hash}`);
+    // const response = await smartAccount.sendGaslessTransactionBatch({
+    //   transactions: txs,
+    // });
+    // console.log(response);
+    // console.log(`Transaction sent: ${response.hash}`);
   };
 
   useEffect(() => {
