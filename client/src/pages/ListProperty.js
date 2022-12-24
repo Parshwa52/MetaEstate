@@ -392,14 +392,14 @@ const ListProperty = () => {
                     class="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary"
                     for="Price"
                   >
-                    Price(in ETH)
+                    Price(in ETH)(0 if you want to list as a drop NFT)
                   </label>
                   <input
                     id="property-price"
                     style={{ fontSize: "20px" }}
                     class=" w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
                     type="text"
-                    placeholder="Price(inETH)"
+                    placeholder="Price(inETH)(0 if you want to list as a drop NFT)"
                     value={
                       isExisting
                         ? parseInt(propertyPrice) / Math.pow(10, 18)
@@ -470,7 +470,7 @@ const ListProperty = () => {
               <div class="grid grid-cols-12 gap-x-[30px]">
                 <div class="mb-[45px] col-span-12">
                   <label class="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary">
-                    Metaverse Hyperlink
+                  Metaverse Hyperlink
                   </label>
                   <input
                     id="Location"

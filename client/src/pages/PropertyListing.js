@@ -157,6 +157,54 @@ const PropertyListing = () => {
     return "Basic " + hash;
   }
 
+  const getRandomInt=(min, max)=> {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+  const checkDropStatus=async(droppedProperties)=>{
+    var filterDroppedProperties=new Array();
+    for(var tokenId in droppedProperties)
+    {
+      var dropstatus = await morterContract.methods.dropStatus(tokenId).call();
+      console.log({dropstatus});
+      if(dropstatus===false)
+      {
+        filterDroppedProperties.push(tokenId);
+      }
+    }
+    return filterDroppedProperties;
+  }
+  const claimYourDrop=async()=> 
+  {
+    //droppedProperties = [2,5,7,8,9]
+    //filterDroppedProperties = [5,7,8]
+    //random from 0 to 2
+    try {
+      var droppedProperties=await morterContract.methods.getAllDroppedProperties().call();
+      await console.log({droppedProperties});
+      var filterDroppedProperties = await checkDropStatus(droppedProperties);
+      await console.log({filterDroppedProperties});
+      if(filterDroppedProperties.length>0)
+      {
+      var randomNumber = getRandomInt(0,filterDroppedProperties.length-1);
+      console.log({randomNumber});
+      await morterContract.methods.getDropProperty(filterDroppedProperties[randomNumber]).send({
+        from: accounts[0]
+      }).then((res)=>{
+        alert(`Token drop ${filterDroppedProperties[randomNumber]} allocated to you.`);
+      });
+    }
+    else
+    {
+      alert("No NFT drops left");
+    }
+    } catch (e) {
+      console.log(JSON.stringify(e));
+    }
+  }
+
   return (
     <div>
       <div className="font-karla text-body text-tiny">
@@ -194,6 +242,13 @@ const PropertyListing = () => {
                       onClick={() => navigate("/add-property")}
                     >
                       Add Property
+                    </button>
+                    <button
+                      style={{ marginTop: "1rem", marginLeft: "15rem" }}
+                      className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block text-[14px] xl:text-[16px] relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all"
+                      onClick={claimYourDrop}
+                    >
+                      Claim your drop
                     </button>
                   </div>
                 </div>

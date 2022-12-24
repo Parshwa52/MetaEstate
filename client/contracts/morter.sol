@@ -37,6 +37,10 @@ contract morter {
 
     mapping(uint256 => House_property) public allproperties;
 
+    uint256[] public droppedProperties;
+
+    mapping(uint256 => bool) public dropStatus;
+
     function listProperty(uint256 _price, uint256 tokenId) public {
         // will be called by property lister
         House_property memory prop;
@@ -51,6 +55,10 @@ contract morter {
         prop.firstEmiDone = false;
         allproperties[prop.property_id] = prop;
         propertycounter += 1;
+        if (_price == 0) {
+            droppedProperties.push(tokenId);
+            dropStatus[tokenId] = false;
+        }
         //nftContract.approveContract(address(this),tokenId);
     }
 
@@ -269,6 +277,24 @@ contract morter {
         prop.lastEMItimestamp = 0;
 
         allproperties[property_id] = prop;
+    }
+
+    function getDropProperty(uint256 property_id) public {
+        House_property storage prop = allproperties[property_id];
+        require(prop.price == 0);
+        nftContract.transferFromOwnerToMortgager(
+            prop.owner,
+            msg.sender,
+            prop.nftTokenId
+        );
+        dropStatus[property_id] = true;
+        prop.owner = msg.sender;
+        prop.status = 0;
+        allproperties[property_id] = prop;
+    }
+
+    function getAllDroppedProperties() public view returns (uint256[] memory) {
+        return droppedProperties;
     }
 
     function getContractBalance() public view returns (uint256) {
