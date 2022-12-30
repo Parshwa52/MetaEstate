@@ -7,7 +7,6 @@ import Container from "@mui/material/Container";
 import DashboardProjects from "../components/DashboardProjects";
 import PersonalInfo from "../components/Personalinfo";
 import BlockchainContext from "../contexts/BlockchainContext";
-import axios from "axios";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -35,43 +34,21 @@ export default function Dashboard() {
       .propertycounter()
       .call();
 
-    const networkId = await web3.eth.net.getId();
-
     var allproperties = [];
-    var myHeaders = new Headers();
-    //console.log(process.env.REACT_APP_COVALENT_API_KEY);
-    const COVALENT_KEY = process.env.REACT_APP_COVALENT_API_KEY;
-    console.log({ COVALENT_KEY });
-    var authenticationHeader = authenticateUser(COVALENT_KEY, "");
-    console.log({ authenticationHeader });
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("Authorization", authenticationHeader);
 
-    var requestOptions = {
-      method: "GET",
-      headers: myHeaders,
-      redirect: "follow",
-    };
-
+    const ALCHEMY_KEY = process.env.REACT_APP_ALCHEMY_API_KEY;
     for (var i = 0; i < totalPropertyCount; i++) {
       var result;
       try {
         result = await fetch(
-          `https://api.covalenthq.com/v1/${networkId}/tokens/${propNFTContractAddress}/nft_metadata/${i}/`,
-          requestOptions
+          `https://polygon-mumbai.g.alchemy.com/nft/v2/${ALCHEMY_KEY}/getNFTMetadata?contractAddress=${propNFTContractAddress}&tokenId=${i}&tokenType=ERC721`,
         ).then((response) => response.text());
       } catch (error) {
         console.log("error", error);
       }
       var resultJSON = await JSON.parse(result);
       console.log({ resultJSON });
-      var metadataURI = resultJSON.data.items[0].nft_data[0].token_url;
-      console.log({ metadataURI });
-      var ipfsLocation = metadataURI.replace(
-        "ipfs://",
-        "https://ipfs.io/ipfs/"
-      );
-      var currProperty = await axios.get(ipfsLocation);
+      var currentPropertyData = resultJSON.metadata;
 
       //get property data from morter contract
       var propertyData = await morterContract.methods.allproperties(i).call();
@@ -79,13 +56,13 @@ export default function Dashboard() {
       if (propertyData.owner.toLowerCase() === accounts[0].toLowerCase()) {
         console.log(propertyData);
         console.log(auctionData);
-        console.log(currProperty);
-        currProperty.data["nftContract"] = propNFTContractAddress;
-        currProperty.data["nftId"] = i;
+        console.log(currentPropertyData);
+        currentPropertyData["nftContract"] = propNFTContractAddress;
+        currentPropertyData["nftId"] = i;
         let finalPropertyData = Object.assign(
           propertyData,
           auctionData,
-          currProperty.data
+          currentPropertyData
         );
         allproperties.push(finalPropertyData);
       }
@@ -94,13 +71,6 @@ export default function Dashboard() {
     Setmyprojects(allproperties);
   };
 
-  function authenticateUser(user, password) {
-    var token = user + ":" + password;
-    // Base64 Encoding -> btoa
-    var hash = btoa(token);
-
-    return "Basic " + hash;
-  }
 
   useEffect(() => {
     if (morterContract)

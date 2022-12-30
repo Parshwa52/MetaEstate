@@ -115,7 +115,8 @@ const PropertyDetails = () => {
                 >
                   Video Sample<span className="text-secondary">.</span>
                 </h5>
-                <Button onClick={()=>navigate('/video',{location:{data:data.video}})}>Check Video</Button>
+
+                <Button onClick={()=>navigate('/video',{state:{videoURL:data.video}})}>Check Video</Button>
                 {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-[10px]">
                   <div className="text-center">
                     <img

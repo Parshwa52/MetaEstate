@@ -1,17 +1,11 @@
 import React, { useEffect, useState, useContext } from "react";
 import BlockchainContext from "../contexts/BlockchainContext";
-//import { NFTStorage } from 'nft.storage/dist/bundle.esm.min.js';
-import { NFTStorage, File } from "nft.storage";
 import dotenv from "dotenv";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
-import ipfsClient from "ipfs-http-client";
-//const ipfsClient = require('ipfs-http-client');
-const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https',apiPath: '/ipfs/api/v0'  });
 // import { ethers } from "ethers";
 // import { ChainId } from "@biconomy/core-types";
 // import SmartAccount from "@biconomy/smart-account";
-
 dotenv.config();
 const ListProperty = () => {
   let location = useLocation();
@@ -152,34 +146,37 @@ const ListProperty = () => {
     window.ethereum.on("accountsChanged", listener);
   }, []);
 
-  const uploadVideo=async()=>{
-   
+  const uploadFileToIPFS=async(fileBlob)=>{
   
-    //alert("hellooooooo");
-    console.log("Submitting file to IPFS...");
-  
-    console.log({filetoupload});
-  
-    await ipfs.add(filetoupload,(error,result)=>{
-      if(error)
-      {
-          alert("Error in uploading");
-      }
-      else
-      {
-        console.log("ipfs hash",result);
-        alert("Your thumbnail is successfully uploaded");
-      }
-    })
+    const apiKey = process.env.REACT_APP_NFT_STORAGE_API_KEY;
+
+
+var config = {
+  method: 'post',
+  url: 'https://api.nft.storage/upload',
+  headers: { 
+    'Authorization': `Bearer ${apiKey}`, 
+    'Content-Type': 'image/jpeg'
+  },
+  data : fileBlob
+};
+
+const fileUploadResponse = await axios(config)
+.then(function (response) {
+  console.log(JSON.stringify(response.data));
+  return response.data;
+})
+.catch(function (error) {
+  console.log(error);
+  return error;
+});
+
+return fileUploadResponse;
   }
   
 
   const mintNFT = async () => {
-    const apiKey = process.env.REACT_APP_NFT_STORAGE_API_KEY;
-    //var url = 'https://api.nft.storage/upload';
-    //var headers = {'Authorization': 'Bearer ' + apiKey};
-
-    const client = new NFTStorage({ token: apiKey });
+    console.log({videoBlob});
     console.log({ metaverseName });
     console.log({ propertyType });
     console.log({ propertyTitle });
@@ -203,11 +200,23 @@ const ListProperty = () => {
       console.log({ ab });
 
       const imageblob = new Blob([ab], { type: "image/jpg" });
+      // Upload image to IPFS
+      const imageUploadResponse = await uploadFileToIPFS(imageblob);
+      console.log({imageUploadResponse});
+      const imageIPFS = imageUploadResponse["value"]["cid"];
+      const imageLink = `https://alchemy.mypinata.cloud/ipfs/${imageIPFS}/`;
 
-      const metadata = await client.store({
+      //upload video to ipfs
+      const videoUploadResponse = await uploadFileToIPFS(videoBlob);
+      console.log({videoUploadResponse});
+      const videoIPFS = videoUploadResponse["value"]["cid"];
+      const videoLink = `https://alchemy.mypinata.cloud/ipfs/${videoIPFS}/`;
+      
+
+      const metadata = {
         name: propertyTitle,
         description: propertyDescription,
-        image: imageblob,
+        image: imageLink,
         metaverseName: metaverseName,
         propertyType: propertyType,
         propertyPrice: priceInWei,
@@ -216,7 +225,7 @@ const ListProperty = () => {
         creator: currentAccount,
         category: 100,
         propertyLocation: propertyLocation,
-        video: "ipfs://QmWhKnEXbniphokV8bNg6NNSFazFESPaXoCzrMyNYzMvWW",
+        video: videoLink,
         usps: [
           "Virtual Property",
           "Secure",
@@ -224,9 +233,16 @@ const ListProperty = () => {
           "Near to shopping mall",
           "Inbuilt casino",
         ],
-      });
+      };
 
-      console.log(metadata.url);
+
+
+      //upload metadata to IPFS
+      const metadataUploadResponse = await uploadFileToIPFS(JSON.stringify(metadata));
+      console.log({metadataUploadResponse});
+      const metadataIPFS = metadataUploadResponse["value"]["cid"];
+      const metadataLink = `ipfs://${metadataIPFS}/`;
+
       //console.log({ currentAccount });
 
       //First mint nft from propNFT
@@ -235,7 +251,7 @@ const ListProperty = () => {
 
      
           await propNFTContract.methods
-          .mintandApproveNFT(accounts[0], metadata.url.toString())
+          .mintandApproveNFT(accounts[0], metadataLink.toString())
           .send({
             from: currentAccount,
           })
@@ -268,9 +284,9 @@ const ListProperty = () => {
     event.preventDefault();
     const file=event.target.files[0];
     await setFileToUpload(file);
-    //var blob = new Blob([file],{"type" : "video\/mp4"});
+    var blob = new Blob([file],{"type" : "video\/mp4"});
     //console.log({blob});
-    //await setVideoBlob(blob);
+    await setVideoBlob(blob);
   }
 
 

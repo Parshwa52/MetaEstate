@@ -169,7 +169,7 @@ const PropertyCard = ({ data }) => {
         >
           <div className="relative">
             <img
-              src={data.image.replace("ipfs://", "https://ipfs.io/ipfs/")}
+              src={data.image.includes("ipfs://")?data.image.replace("ipfs://", "https://ipfs.io/ipfs/"):data.image}
               className="w-full h-full"
               loading="lazy"
               width="370"

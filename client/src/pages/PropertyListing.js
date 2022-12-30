@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 // import { propertyCollection } from "./propertyMetaData";
 import BlockchainContext from "../contexts/BlockchainContext";
 import dotenv from "dotenv";
-import axios from "axios";
 dotenv.config();
 const PropertyListing = () => {
   const {
@@ -46,42 +45,19 @@ const PropertyListing = () => {
 
     const tc = await morterContract.methods.tc().call();
     setTradingCompany(tc);
-    var totalPropertyCountInt = parseInt(totalPropertyCount);
-    const networkId = await web3.eth.net.getId();
     var allproperties = [];
-    var myHeaders = new Headers();
-    //console.log(process.env.REACT_APP_COVALENT_API_KEY);
-    const COVALENT_KEY = process.env.REACT_APP_COVALENT_API_KEY;
-    console.log({ COVALENT_KEY });
-    var authenticationHeader = authenticateUser(COVALENT_KEY, "");
-    console.log({ authenticationHeader });
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("Authorization", authenticationHeader);
-
-    var requestOptions = {
-      method: "GET",
-      headers: myHeaders,
-      redirect: "follow",
-    };
+    const ALCHEMY_KEY = process.env.REACT_APP_ALCHEMY_API_KEY;
 
     for (var i = 0; i < totalPropertyCount; i++) {
       var result;
       var res;
       try {
         result = await fetch(
-          `https://api.covalenthq.com/v1/${networkId}/tokens/${propNFTContractAddress}/nft_metadata/${i}/`,
-          requestOptions
+          `https://polygon-mumbai.g.alchemy.com/nft/v2/${ALCHEMY_KEY}/getNFTMetadata?contractAddress=${propNFTContractAddress}&tokenId=${i}&tokenType=ERC721`,
         ).then((response) => response.text());
         var resultJSON = await JSON.parse(result);
         console.log({ resultJSON });
-        var metadataURI = resultJSON.data.items[0].nft_data[0].token_url;
-        console.log({ metadataURI });
-        var ipfsLocation = metadataURI.replace(
-          "ipfs://",
-          "https://ipfs.io/ipfs/"
-        );
-        var currProperty = await axios.get(ipfsLocation);
-        var currentPropertyData = currProperty.data;
+        var currentPropertyData = resultJSON.metadata;
 
         //get property data from morter contract
         var propertyData = await morterContract.methods.allproperties(i).call();
@@ -147,14 +123,6 @@ const PropertyListing = () => {
 
   function handleCategoryChange(event) {
     setSelectedCategory(parseInt(event.target.value));
-  }
-
-  function authenticateUser(user, password) {
-    var token = user + ":" + password;
-    // Base64 Encoding -> btoa
-    var hash = btoa(token);
-
-    return "Basic " + hash;
   }
 
   const getRandomInt=(min, max)=> {

@@ -13,7 +13,6 @@ import propNFT from "./abis/propNFT.json";
 import morter from "./abis/morter.json";
 import auction from "./abis/Auction.json";
 import BlockchainContext from "./contexts/BlockchainContext";
-import { DecentralizedStoragePlayback } from "./components/DecentralizedStoragePlayback";
 import {Livepeer} from "./components/livepeer";
 const getWeb3 = async () => {
   let tempWeb3 = undefined;
