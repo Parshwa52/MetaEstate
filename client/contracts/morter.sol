@@ -41,6 +41,8 @@ contract morter {
 
     mapping(uint256 => bool) public dropStatus;
 
+    event dropCollected(address indexed owner, uint indexed nftId,string time);
+
     function listProperty(uint256 _price, uint256 tokenId) public {
         // will be called by property lister
         House_property memory prop;
@@ -279,7 +281,7 @@ contract morter {
         allproperties[property_id] = prop;
     }
 
-    function getDropProperty(uint256 property_id) public {
+    function getDropProperty(uint256 property_id,string memory time) public {
         House_property storage prop = allproperties[property_id];
         require(prop.price == 0);
         nftContract.transferFromOwnerToMortgager(
@@ -291,6 +293,7 @@ contract morter {
         prop.owner = msg.sender;
         prop.status = 0;
         allproperties[property_id] = prop;
+        emit dropCollected(msg.sender,property_id,time);
     }
 
     function getAllDroppedProperties() public view returns (uint256[] memory) {

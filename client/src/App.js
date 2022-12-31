@@ -13,7 +13,10 @@ import propNFT from "./abis/propNFT.json";
 import morter from "./abis/morter.json";
 import auction from "./abis/Auction.json";
 import BlockchainContext from "./contexts/BlockchainContext";
-import {Livepeer} from "./components/livepeer";
+import { Livepeer } from "./components/livepeer";
+import dotenv from "dotenv";
+require("dotenv").config();
+
 const getWeb3 = async () => {
   let tempWeb3 = undefined;
   if (window.ethereum) {
@@ -28,7 +31,6 @@ const getWeb3 = async () => {
       //const accounts = await window.web3.eth.getAccounts();
     } catch (error) {
       // User denied account access...
-
     }
   }
   // Legacy dapp browsers...
@@ -143,7 +145,7 @@ const App = () => {
           <Route exact path="/add-property" element={<ListProperty />} />
           <Route exact path="/property-details" element={<PropertyDetails />} />
           <Route exact path="/dashboard" element={<Dashboard />} />
-          <Route exact path="/video" element={<Livepeer/>} />
+          <Route exact path="/video" element={<Livepeer />} />
           <Route
             exact
             path="/PropertyMarketplace"

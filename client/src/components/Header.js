@@ -89,14 +89,6 @@ const Header = () => {
                       </li>
                       <li className="mr-7 xl:mr-[40px] relative group py-[20px]">
                         <a
-                          href="/about"
-                          className="transition-all hover:text-secondary"
-                        >
-                          About
-                        </a>
-                      </li>
-                      <li className="mr-7 xl:mr-[40px] relative group py-[20px]">
-                        <a
                           href="/dashboard"
                           className="transition-all hover:text-secondary"
                         >

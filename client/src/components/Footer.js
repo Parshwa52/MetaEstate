@@ -23,7 +23,7 @@ const Footer = () => {
                 fontWeight: "700",
               }}
             >
-              HomeLand{" "}
+              Metaestate{" "}
             </a>
             <p
               className="mb-[5px] xl:mb-[40px] max-w-[270px]"
@@ -43,7 +43,7 @@ const Footer = () => {
                 fontFamily: "Georgia",
               }}
             >
-              &copy; <span className="text-secondary">HomeLand.</span> All
+              &copy; <span className="text-secondary">Metaestate.</span> All
               Rights Reserved
             </p>
           </div>
@@ -216,7 +216,7 @@ const Footer = () => {
               </li>
             </ul>
             <p className="text-sm md:hidden mb-7 sm:mb-0 mt-[20px]">
-              &copy; <span className="text-secondary">HomeLand.</span> All
+              &copy; <span className="text-secondary">Metaestate.</span> All
               Rights Reserved
             </p>
           </div>

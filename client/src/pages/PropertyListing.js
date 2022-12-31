@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useContext, useMemo } from "react";
+import CircularProgress from "@mui/material/CircularProgress";
+
 import PropertyCard from "../components/PropertyCard";
 import { useNavigate } from "react-router-dom";
 // import { propertyCollection } from "./propertyMetaData";
 import BlockchainContext from "../contexts/BlockchainContext";
 import dotenv from "dotenv";
-dotenv.config();
+import axios from "axios";
+require("dotenv").config();
+
 const PropertyListing = () => {
   const {
     web3,
@@ -37,8 +41,9 @@ const PropertyListing = () => {
 
   const fetchData = async () => {
     console.log({ morterContract });
-    console.log({morterContractAddress});
-    
+    console.log({ morterContractAddress });
+    const ALCHEMY_KEY = process.env.REACT_APP_ALCHEMY_API_KEY;
+
     const totalPropertyCount = await morterContract.methods
       .propertycounter()
       .call();
@@ -46,18 +51,16 @@ const PropertyListing = () => {
     const tc = await morterContract.methods.tc().call();
     setTradingCompany(tc);
     var allproperties = [];
-    const ALCHEMY_KEY = process.env.REACT_APP_ALCHEMY_API_KEY;
 
     for (var i = 0; i < totalPropertyCount; i++) {
       var result;
       var res;
       try {
-        result = await fetch(
-          `https://polygon-mumbai.g.alchemy.com/nft/v2/${ALCHEMY_KEY}/getNFTMetadata?contractAddress=${propNFTContractAddress}&tokenId=${i}&tokenType=ERC721`,
-        ).then((response) => response.text());
-        var resultJSON = await JSON.parse(result);
-        console.log({ resultJSON });
-        var currentPropertyData = resultJSON.metadata;
+        result = await axios.get(
+          `https://polygon-mumbai.g.alchemy.com/nft/v2/${ALCHEMY_KEY}/getNFTMetadata?contractAddress=${propNFTContractAddress}&tokenId=${i}&tokenType=ERC721`
+        );
+        console.log(result);
+        var currentPropertyData = result.data.metadata;
 
         //get property data from morter contract
         var propertyData = await morterContract.methods.allproperties(i).call();
@@ -74,12 +77,10 @@ const PropertyListing = () => {
         );
         allproperties.push(finalPropertyData);
       } catch (error) {
-        console.log("error", error);
+        console.log(error);
       }
     }
     setSportList(allproperties);
-    console.log({ allproperties });
-    console.log(JSON.stringify(allproperties));
   };
 
   function getFilteredList() {
@@ -106,12 +107,8 @@ const PropertyListing = () => {
       return sportList.filter(
         (item) => item.mortgager.toLowerCase() === accounts[0].toLowerCase()
       );
-    }
-    else if(selectedCategory===500)
-    {
-      return sportList.filter(
-        (item) => item.auctionStarted === true
-      );
+    } else if (selectedCategory === 500) {
+      return sportList.filter((item) => item.auctionStarted === true);
     }
     return [];
   }
@@ -125,53 +122,54 @@ const PropertyListing = () => {
     setSelectedCategory(parseInt(event.target.value));
   }
 
-  const getRandomInt=(min, max)=> {
+  const getRandomInt = (min, max) => {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+  };
 
-  const checkDropStatus=async(droppedProperties)=>{
-    var filterDroppedProperties=new Array();
-    for(var tokenId in droppedProperties)
-    {
+  const checkDropStatus = async (droppedProperties) => {
+    var filterDroppedProperties = [];
+    for (var tokenId in droppedProperties) {
       var dropstatus = await morterContract.methods.dropStatus(tokenId).call();
-      console.log({dropstatus});
-      if(dropstatus===false)
-      {
+      console.log({ dropstatus });
+      if (dropstatus === false) {
         filterDroppedProperties.push(tokenId);
       }
     }
     return filterDroppedProperties;
-  }
-  const claimYourDrop=async()=> 
-  {
+  };
+  const claimYourDrop = async () => {
     //droppedProperties = [2,5,7,8,9]
     //filterDroppedProperties = [5,7,8]
     //random from 0 to 2
     try {
-      var droppedProperties=await morterContract.methods.getAllDroppedProperties().call();
-      await console.log({droppedProperties});
+      var droppedProperties = await morterContract.methods
+        .getAllDroppedProperties()
+        .call();
+      console.log({ droppedProperties });
       var filterDroppedProperties = await checkDropStatus(droppedProperties);
-      await console.log({filterDroppedProperties});
-      if(filterDroppedProperties.length>0)
-      {
-      var randomNumber = getRandomInt(0,filterDroppedProperties.length-1);
-      console.log({randomNumber});
-      await morterContract.methods.getDropProperty(filterDroppedProperties[randomNumber]).send({
-        from: accounts[0]
-      }).then((res)=>{
-        alert(`Token drop ${filterDroppedProperties[randomNumber]} allocated to you.`);
-      });
-    }
-    else
-    {
-      alert("No NFT drops left");
-    }
+      console.log({ filterDroppedProperties });
+      if (filterDroppedProperties.length > 0) {
+        var randomNumber = getRandomInt(0, filterDroppedProperties.length - 1);
+        console.log({ randomNumber });
+        await morterContract.methods
+          .getDropProperty(filterDroppedProperties[randomNumber])
+          .send({
+            from: accounts[0],
+          })
+          .then((res) => {
+            alert(
+              `Token drop ${filterDroppedProperties[randomNumber]} allocated to you.`
+            );
+          });
+      } else {
+        alert("No NFT drops left");
+      }
     } catch (e) {
       console.log(JSON.stringify(e));
     }
-  }
+  };
 
   return (
     <div>
@@ -204,15 +202,15 @@ const PropertyListing = () => {
                       Huge number of propreties availabe here for buy and sell
                       also you can find here co-living property as you like
                     </p>
-                    <button
+                    {/* <button
                       style={{ marginTop: "1rem", marginLeft: "15rem" }}
                       className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block text-[14px] xl:text-[16px] relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all"
                       onClick={() => navigate("/add-property")}
                     >
                       Add Property
-                    </button>
+                    </button> */}
                     <button
-                      style={{ marginTop: "1rem", marginLeft: "15rem" }}
+                      style={{ marginTop: "1rem", marginLeft: "14rem" }}
                       className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[20px] py-[15px] capitalize font-medium text-white hidden sm:block text-[14px] xl:text-[16px] relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all"
                       onClick={claimYourDrop}
                     >
@@ -223,9 +221,7 @@ const PropertyListing = () => {
               </div>
             </div>
           </section>
-          {/* <!-- Hero section end -->
 
-        <!-- Popular Properties start --> */}
           <section className="popular-properties py-[80px] lg:py-[120px]">
             <div className="container">
               <div className="filter-container">
@@ -261,16 +257,19 @@ const PropertyListing = () => {
               </div>
               <br />
               <br />
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-[30px]">
-                {filteredList.map((element, index) => (
-                  <PropertyCard data={element} key={index} />
-                ))}{" "}
-              </div>
+              {sportList.length > 0 ? (
+                <>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-[30px]">
+                    {filteredList.map((element, index) => (
+                      <PropertyCard data={element} key={index} />
+                    ))}{" "}
+                  </div>
+                </>
+              ) : (
+                <CircularProgress size={70} />
+              )}
             </div>
           </section>
-          {/* <!-- Popular Properties end -->
-
-        <!-- News Letter section start --> */}
           <section className="py-[80px] lg:p-[90px] bg-primary relative">
             <div className="container">
               <div className="grid grid-cols-1">
@@ -322,6 +321,7 @@ const PropertyListing = () => {
               </div>
             </div>
           </section>
+
           {/* <!-- News Letter section End -->
 
         <!-- Footer Start --> */}

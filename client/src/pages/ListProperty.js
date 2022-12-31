@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useContext } from "react";
 import BlockchainContext from "../contexts/BlockchainContext";
 import dotenv from "dotenv";
-import { useLocation } from "react-router-dom";
+import { useLocation, Navigate } from "react-router-dom";
 import axios from "axios";
 // import { ethers } from "ethers";
 // import { ChainId } from "@biconomy/core-types";
 // import SmartAccount from "@biconomy/smart-account";
 dotenv.config();
+require("dotenv").config();
+
 const ListProperty = () => {
   let location = useLocation();
   let isExisting = location.state ? location.state.isExisting : false;
@@ -46,9 +48,7 @@ const ListProperty = () => {
 
   const makeManyTxs = async () => {
     // const walletProvider = new web3.providers.Web3Provider(window.ethereum);
-
     // // Initialize the Smart Account
-
     // let options = {
     //   activeNetworkId: ChainId.POLYGON_MUMBAI,
     //   supportedNetworksIds: [
@@ -57,16 +57,13 @@ const ListProperty = () => {
     //     ChainId.POLYGON_MUMBAI,
     //   ],
     // };
-
     // let smartAccount = new SmartAccount(walletProvider, options);
     // smartAccount = await smartAccount.init();
     // const txs = [];
-
     // let tokenId = await propNFTContract.methods._tokenIds().call();
     // //console.log({ morterContractAddress });
     // //console.log({ tokenId });
     // let currentTokenId = parseInt(tokenId) - 1;
-
     // const interface1 = new ethers.utils.Interface([
     //   "function approveContract(address contractToApprove,uint tokenId)",
     // ]);
@@ -74,18 +71,14 @@ const ListProperty = () => {
     //   propNFTContractAddress.toString(),
     //   parseInt(currentTokenId),
     // ]);
-
     // const tx1 = {
     //   to: interface1,
     //   data: data1,
     // };
-
     // txs.push(tx1);
-
     // var priceInWei = await web3.utils
     //   .toBN(web3.utils.toWei(propertyPrice.toString(), "ether"))
     //   .toString();
-
     // const interface2 = new ethers.utils.Interface([
     //   "function listProperty(uint256 _price, uint256 tokenId)",
     // ]);
@@ -93,14 +86,11 @@ const ListProperty = () => {
     //   parseInt(priceInWei),
     //   parseInt(currentTokenId),
     // ]);
-
     // const tx2 = {
     //   to: interface2,
     //   data: data2,
     // };
-
     // txs.push(tx2);
-
     // const response = await smartAccount.sendGaslessTransactionBatch({
     //   transactions: txs,
     // });
@@ -146,37 +136,34 @@ const ListProperty = () => {
     window.ethereum.on("accountsChanged", listener);
   }, []);
 
-  const uploadFileToIPFS=async(fileBlob)=>{
-  
+  const uploadFileToIPFS = async (fileBlob) => {
     const apiKey = process.env.REACT_APP_NFT_STORAGE_API_KEY;
 
+    var config = {
+      method: "post",
+      url: "https://api.nft.storage/upload",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "image/jpeg",
+      },
+      data: fileBlob,
+    };
 
-var config = {
-  method: 'post',
-  url: 'https://api.nft.storage/upload',
-  headers: { 
-    'Authorization': `Bearer ${apiKey}`, 
-    'Content-Type': 'image/jpeg'
-  },
-  data : fileBlob
-};
+    const fileUploadResponse = await axios(config)
+      .then(function (response) {
+        console.log(JSON.stringify(response.data));
+        return response.data;
+      })
+      .catch(function (error) {
+        console.log(error);
+        return error;
+      });
 
-const fileUploadResponse = await axios(config)
-.then(function (response) {
-  console.log(JSON.stringify(response.data));
-  return response.data;
-})
-.catch(function (error) {
-  console.log(error);
-  return error;
-});
-
-return fileUploadResponse;
-  }
-  
+    return fileUploadResponse;
+  };
 
   const mintNFT = async () => {
-    console.log({videoBlob});
+    console.log({ videoBlob });
     console.log({ metaverseName });
     console.log({ propertyType });
     console.log({ propertyTitle });
@@ -202,16 +189,15 @@ return fileUploadResponse;
       const imageblob = new Blob([ab], { type: "image/jpg" });
       // Upload image to IPFS
       const imageUploadResponse = await uploadFileToIPFS(imageblob);
-      console.log({imageUploadResponse});
+      console.log({ imageUploadResponse });
       const imageIPFS = imageUploadResponse["value"]["cid"];
       const imageLink = `https://alchemy.mypinata.cloud/ipfs/${imageIPFS}/`;
 
       //upload video to ipfs
       const videoUploadResponse = await uploadFileToIPFS(videoBlob);
-      console.log({videoUploadResponse});
+      console.log({ videoUploadResponse });
       const videoIPFS = videoUploadResponse["value"]["cid"];
       const videoLink = `https://alchemy.mypinata.cloud/ipfs/${videoIPFS}/`;
-      
 
       const metadata = {
         name: propertyTitle,
@@ -235,11 +221,11 @@ return fileUploadResponse;
         ],
       };
 
-
-
       //upload metadata to IPFS
-      const metadataUploadResponse = await uploadFileToIPFS(JSON.stringify(metadata));
-      console.log({metadataUploadResponse});
+      const metadataUploadResponse = await uploadFileToIPFS(
+        JSON.stringify(metadata)
+      );
+      console.log({ metadataUploadResponse });
       const metadataIPFS = metadataUploadResponse["value"]["cid"];
       const metadataLink = `ipfs://${metadataIPFS}/`;
 
@@ -249,53 +235,43 @@ return fileUploadResponse;
       //approve morter and auction contract for this nft
       //List the nft via morter list
 
-     
+      await propNFTContract.methods
+        .mintandApproveNFT(accounts[0], metadataLink.toString())
+        .send({
+          from: currentAccount,
+        })
+        .then(async (result) => {
+          console.log({ result });
+          //console.log(propNFTContract.methods._tokenIds().call());
+          var tokenId = await propNFTContract.methods._tokenIds().call();
+          //console.log({ morterContractAddress });
+          //console.log({ tokenId });
+          var currentTokenId = parseInt(tokenId) - 1;
+          //console.log({ currentTokenId });
           await propNFTContract.methods
-          .mintandApproveNFT(accounts[0], metadataLink.toString())
-          .send({
-            from: currentAccount,
-          })
-          .then(async (result) => {
-            console.log({ result });
-            //console.log(propNFTContract.methods._tokenIds().call());
-            var tokenId = await propNFTContract.methods._tokenIds().call();
-            //console.log({ morterContractAddress });
-            //console.log({ tokenId });
-            var currentTokenId = parseInt(tokenId) - 1;
-            //console.log({ currentTokenId });
-            await propNFTContract.methods
-              .approveContract(morterContractAddress, currentTokenId)
-              .send({
-                from: currentAccount,
-              });
-  
-            return currentTokenId;
-          })
-          .then((tokenId) => {
-            //console.log({ tokenId });
-            morterContract.methods.listProperty(priceInWei, tokenId).send({
+            .approveContract(morterContractAddress, currentTokenId)
+            .send({
               from: currentAccount,
             });
+
+          return currentTokenId;
+        })
+        .then((tokenId) => {
+          //console.log({ tokenId });
+          morterContract.methods.listProperty(priceInWei, tokenId).send({
+            from: currentAccount,
           });
+        });
     };
   };
 
-  const captureVideoFile=async(event)=>{
+  const captureVideoFile = async (event) => {
     event.preventDefault();
-    const file=event.target.files[0];
+    const file = event.target.files[0];
     await setFileToUpload(file);
-    var blob = new Blob([file],{"type" : "video\/mp4"});
+    var blob = new Blob([file], { type: "video/mp4" });
     //console.log({blob});
     await setVideoBlob(blob);
-  }
-
-
-
-  
-  
-
-  const handleChange = (e) => {
-    e.preventDefault();
   };
 
   const handleImageChange = (e) => {
@@ -307,27 +283,32 @@ return fileUploadResponse;
       console.log({ file });
     }
   };
+  if (
+    !isExisting &&
+    process.env.REACT_APP_TRADING_COMPANY_1.toLowerCase() !==
+      accounts[0].toLowerCase() &&
+    process.env.REACT_APP_TRADING_COMPANY_2.toLowerCase() !==
+      accounts[0].toLowerCase()
+  )
+    return <Navigate to="/" />;
   return (
-    <div class="font-karla text-body text-tiny">
-      <div class="overflow-hidden">
+    <div className="font-karla text-body text-tiny">
+      <div className="overflow-hidden">
         <section
-          class="bg-no-repeat bg-center bg-cover bg-[#FFF6F0] h-[350px] lg:h-[513px] flex flex-wrap items-center relative before:absolute before:inset-0 before:content-[''] before:bg-[#000000] before:opacity-[70%]"
+          className="bg-no-repeat bg-center bg-cover bg-[#FFF6F0] h-[350px] lg:h-[513px] flex flex-wrap items-center relative before:absolute before:inset-0 before:content-[''] before:bg-[#000000] before:opacity-[70%]"
           style={{
             backgroundImage:
               "url('assets/images/metaverseImages/metaverseImages/shoppingComplex.jpg')",
           }}
         >
-          <div class="container">
-            <div class="grid grid-cols-12">
-              <div class="col-span-12">
-                <div class="max-w-[700px]  mx-auto text-center text-white relative z-[1]">
-                  <div class="mb-5">
-                    <span class="text-base block">{currentAccount}</span>
-                  </div>
-                  <h1 class="font-lora text-[32px] sm:text-[50px] md:text-[68px] lg:text-[50px] leading-tight xl:text-2xl font-medium">
+          <div className="container">
+            <div className="grid grid-cols-12">
+              <div className="col-span-12">
+                <div className="max-w-[700px]  mx-auto text-center text-white relative z-[1]">
+                  <h1 className="font-lora text-[32px] sm:text-[50px] md:text-[68px] lg:text-[50px] leading-tight xl:text-2xl font-medium">
                     Add Property
                   </h1>
-                  <p class="text-base mt-5 max-w-[500px] mx-auto text-center">
+                  <p className="text-base mt-5 max-w-[500px] mx-auto text-center">
                     Huge number of propreties availabe here for buy and sell
                     also you can find here co-living property as you liked
                   </p>
@@ -337,21 +318,22 @@ return fileUploadResponse;
           </div>
         </section>
 
-        <div class="pt-[80px] lg:pt-[120px] add-properties-form-select">
-          <div class="container">
+        <div className="pt-[80px] lg:pt-[120px] add-properties-form-select">
+          <div className="container">
             <form action="#">
-              <div class="grid grid-cols-12 gap-x-[30px]">
-                <div class="mb-[45px] col-span-12 md:col-span-6">
+              <div className="grid grid-cols-12 gap-x-[30px]">
+                <div className="mb-[45px] col-span-12 md:col-span-6">
                   <label
-                    class="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary"
-                    for="property-title"
+                    className="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary"
+                    htmlFor="property-title"
+                    style={{ color: "#11468F" }}
                   >
                     {" "}
                     Metaverse Name
                   </label>
                   <input
                     id="Location"
-                    class="font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
+                    className="font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
                     type="text"
                     placeholder="Metaverse Name"
                     style={{ fontSize: "20px" }}
@@ -361,17 +343,18 @@ return fileUploadResponse;
                     disabled={isExisting ? true : false}
                   />
                 </div>
-                <div class="mb-[45px] col-span-12 md:col-span-6">
+                <div className="mb-[45px] col-span-12 md:col-span-6">
                   <label
-                    class="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary"
-                    for="PropertyType1"
+                    className="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary"
+                    htmlFor="PropertyType1"
+                    style={{ color: "#11468F" }}
                   >
                     Property Type
                   </label>
 
-                  <div class="mb-[45px] col-span-12 md:col-span-6">
+                  <div className="mb-[45px] col-span-12 md:col-span-6">
                     <input
-                      class="font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
+                      className="font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
                       type="text"
                       placeholder="Property Type"
                       style={{ fontSize: "20px" }}
@@ -382,18 +365,19 @@ return fileUploadResponse;
                   </div>
                 </div>
               </div>
-              <div class="grid grid-cols-12 gap-x-[30px]">
-                <div class="mb-[45px] col-span-12 md:col-span-8">
+              <div className="grid grid-cols-12 gap-x-[30px]">
+                <div className="mb-[45px] col-span-12 md:col-span-8">
                   <label
-                    class="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary"
-                    for="property-title"
+                    className="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary"
+                    htmlFor="property-title"
+                    style={{ color: "#11468F" }}
                   >
                     {" "}
                     Property Title
                   </label>
                   <input
                     id="property-title"
-                    class="font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
+                    className="font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
                     type="text"
                     placeholder="Property Title"
                     style={{ fontSize: "20px" }}
@@ -403,17 +387,22 @@ return fileUploadResponse;
                   />
                 </div>
 
-                <div class="mb-[45px] col-span-12 md:col-span-4">
+                <div className="mb-[45px] col-span-12 md:col-span-4">
                   <label
-                    class="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary"
-                    for="Price"
+                    className="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary"
+                    htmlFor="Price"
+                    style={{ color: "#11468F" }}
                   >
-                    Price(in ETH)(0 if you want to list as a drop NFT)
+                    Price(in ETH)
+                    <br />
+                    <span style={{ color: "red" }}>
+                      (0 if you want to list as a drop NFT)
+                    </span>
                   </label>
                   <input
                     id="property-price"
                     style={{ fontSize: "20px" }}
-                    class=" w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
+                    className=" w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
                     type="text"
                     placeholder="Price(inETH)(0 if you want to list as a drop NFT)"
                     value={
@@ -425,16 +414,17 @@ return fileUploadResponse;
                   />
                 </div>
               </div>
-              <div class="grid grid-cols-12 gap-x-[30px]">
-                <div class="mb-[45px] col-span-12">
+              <div className="grid grid-cols-12 gap-x-[30px]">
+                <div className="mb-[45px] col-span-12">
                   <label
-                    class="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary"
-                    for="textarea"
+                    className="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary"
+                    htmlFor="textarea"
+                    style={{ color: "#11468F" }}
                   >
                     Property Description
                   </label>
                   <textarea
-                    class="h-[196px] xl:h-[360px] font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] resize-none"
+                    className="h-[196px] xl:h-[360px] font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] resize-none"
                     name="textarea"
                     id="textarea"
                     cols="30"
@@ -448,20 +438,21 @@ return fileUploadResponse;
                 </div>
               </div>
 
-              <div class="grid grid-cols-12 gap-x-[30px]">
-                <div class="col-span-12">
+              <div className="grid grid-cols-12 gap-x-[30px]">
+                <div className="col-span-12">
                   <label
-                    class="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary"
-                    for="Location"
+                    className="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary"
+                    htmlFor="Location"
+                    style={{ color: "#11468F" }}
                   >
                     Coordinates
                   </label>
                 </div>
 
-                <div class="mb-[45px] col-span-12 md:col-span-6">
+                <div className="mb-[45px] col-span-12 md:col-span-6">
                   <input
                     id="Location"
-                    class="font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
+                    className="font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
                     type="text"
                     placeholder="Coordinate-X"
                     style={{ fontSize: "20px" }}
@@ -471,9 +462,9 @@ return fileUploadResponse;
                   />
                 </div>
 
-                <div class="mb-[45px] col-span-12 md:col-span-6">
+                <div className="mb-[45px] col-span-12 md:col-span-6">
                   <input
-                    class="font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
+                    className="font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
                     type="text"
                     placeholder="Coordinate-Y"
                     style={{ fontSize: "20px" }}
@@ -483,14 +474,17 @@ return fileUploadResponse;
                   />
                 </div>
               </div>
-              <div class="grid grid-cols-12 gap-x-[30px]">
-                <div class="mb-[45px] col-span-12">
-                  <label class="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary">
-                  Metaverse Hyperlink
+              <div className="grid grid-cols-12 gap-x-[30px]">
+                <div className="mb-[45px] col-span-12">
+                  <label
+                    style={{ color: "#11468F" }}
+                    className="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary"
+                  >
+                    Metaverse Hyperlink
                   </label>
                   <input
                     id="Location"
-                    class="font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
+                    className="font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
                     type="text"
                     placeholder="Metaverse Hyperlink"
                     style={{ fontSize: "20px" }}
@@ -501,15 +495,21 @@ return fileUploadResponse;
                 </div>
               </div>
 
-              <div class="grid grid-cols-12 gap-x-[30px]">
-                <div class="mb-[45px] col-span-12">
-                  <label class="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary">
+              <div className="grid grid-cols-12 gap-x-[30px]">
+                <div className="mb-[45px] col-span-12">
+                  <label
+                    style={{ color: "#11468F" }}
+                    className="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary"
+                  >
                     Add Image
                   </label>
-                  <div class="py-[35px] px-[15px] flex flex-wrap items-center justify-center text-center border border-[#1B2D40] border-opacity-60 rounded-[8px]">
-                    <div class="relative">
+                  <div
+                    style={{ border: "2px solid white" }}
+                    className="py-[35px] px-[15px] flex flex-wrap items-center justify-center text-center border border-[#1B2D40] border-opacity-60 rounded-[8px]"
+                  >
+                    <div className="relative">
                       <input
-                        class="absolute inset-0 z-[0] opacity-0 w-full"
+                        className="absolute inset-0 z-[0] opacity-0 w-full"
                         type="file"
                         name="Images"
                         id="Images"
@@ -517,12 +517,12 @@ return fileUploadResponse;
                         disabled={isExisting ? true : false}
                       />
                       <label
-                        for="Images"
-                        class="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[30px] py-[12px] capitalize font-medium text-white text-[14px] xl:text-[16px] relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all flex flex-wrap items-center justify-center cursor-pointer"
+                        htmlFor="Images"
+                        className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[30px] py-[12px] capitalize font-medium text-white text-[14px] xl:text-[16px] relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all flex flex-wrap items-center justify-center cursor-pointer"
                       >
                         {" "}
                         <svg
-                          class="mr-[5px]"
+                          className="mr-[5px]"
                           width="22"
                           height="22"
                           viewBox="0 0 22 22"
@@ -541,16 +541,21 @@ return fileUploadResponse;
                 </div>
               </div>
 
-
-              <div class="grid grid-cols-12 gap-x-[30px]">
-                <div class="mb-[45px] col-span-12">
-                  <label class="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary">
+              <div className="grid grid-cols-12 gap-x-[30px]">
+                <div className="mb-[45px] col-span-12">
+                  <label
+                    style={{ color: "#11468F" }}
+                    className="mb-[20px] font-lora text-[20px] font-medium leading-none block text-primary"
+                  >
                     Add Video
                   </label>
-                  <div class="py-[35px] px-[15px] flex flex-wrap items-center justify-center text-center border border-[#1B2D40] border-opacity-60 rounded-[8px]">
-                    <div class="relative">
+                  <div
+                    style={{ border: "2px solid white" }}
+                    className="py-[35px] px-[15px] flex flex-wrap items-center justify-center text-center border border-[#1B2D40] border-opacity-60 rounded-[8px]"
+                  >
+                    <div className="relative">
                       <input
-                        class="absolute inset-0 z-[0] opacity-0 w-full"
+                        className="absolute inset-0 z-[0] opacity-0 w-full"
                         type="file"
                         name="Videos"
                         id="Videos"
@@ -558,12 +563,12 @@ return fileUploadResponse;
                         disabled={isExisting ? true : false}
                       />
                       <label
-                        for="Videos"
-                        class="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[30px] py-[12px] capitalize font-medium text-white text-[14px] xl:text-[16px] relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all flex flex-wrap items-center justify-center cursor-pointer"
+                        htmlFor="Videos"
+                        className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[30px] py-[12px] capitalize font-medium text-white text-[14px] xl:text-[16px] relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all flex flex-wrap items-center justify-center cursor-pointer"
                       >
                         {" "}
                         <svg
-                          class="mr-[5px]"
+                          className="mr-[5px]"
                           width="22"
                           height="22"
                           viewBox="0 0 22 22"
@@ -586,11 +591,11 @@ return fileUploadResponse;
         </div>
         {/* <!-- create agency End--> */}
         <div align="center">
-          <div class="container">
+          <div className="container">
             <button
               type="submit"
               onClick={mintNFT}
-              class="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[40px] py-[15px] capitalize font-medium text-white text-[14px] xl:text-[16px] relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all"
+              className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[40px] py-[15px] capitalize font-medium text-white text-[14px] xl:text-[16px] relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all"
             >
               Add Property
             </button>
@@ -601,7 +606,7 @@ return fileUploadResponse;
         {/* <!-- Footer End --> */}
         <a
           id="scrollUp"
-          class="w-12 h-12 rounded-full bg-primary text-white fixed right-5 bottom-16 flex flex-wrap items-center justify-center transition-all duration-300 z-10"
+          className="w-12 h-12 rounded-full bg-primary text-white fixed right-5 bottom-16 flex flex-wrap items-center justify-center transition-all duration-300 z-10"
           href="/#"
           aria-label="scroll up"
         >
