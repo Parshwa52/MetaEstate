@@ -196,7 +196,7 @@ const ListProperty = () => {
           //console.log({ tokenId });
           console.log(priceInWei);
           morterContract.methods
-            .listProperty(parseInt(priceInWei), tokenId)
+            .listProperty(priceInWei, tokenId)
             .send({
               from: currentAccount,
             });

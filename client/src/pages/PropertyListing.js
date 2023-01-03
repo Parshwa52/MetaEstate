@@ -291,7 +291,7 @@ const PropertyListing = () => {
               <br />
               {loading === false ? (
                 <>
-                  {sportList.length > 0 ? (
+                  {filteredList.length > 0 ? (
                     <>
                       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-[30px]">
                         {filteredList.map((element, index) => (
