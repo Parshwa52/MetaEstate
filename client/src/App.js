@@ -14,7 +14,6 @@ import morter from "./abis/morter.json";
 import auction from "./abis/Auction.json";
 import BlockchainContext from "./contexts/BlockchainContext";
 import { Livepeer } from "./components/livepeer";
-import dotenv from "dotenv";
 require("dotenv").config();
 
 const getWeb3 = async () => {
@@ -103,7 +102,7 @@ const App = () => {
       }
 
       //Importing the auction Contract
-      var networkdata = auction.networks[networkId];
+      networkdata = auction.networks[networkId];
       console.log("auction=", networkdata);
       if (networkdata) {
         const abi = auction.abi;

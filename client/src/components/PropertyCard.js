@@ -169,7 +169,13 @@ const PropertyCard = ({ data }) => {
         >
           <div className="relative">
             <img
-              src={data.image.includes("ipfs://")?data.image.replace("ipfs://", "https://ipfs.io/ipfs/"):data.image}
+              src={
+                data.image
+                  ? data.image.includes("ipfs://")
+                    ? data.image.replace("ipfs://", "https://ipfs.io/ipfs/")
+                    : data.image
+                  : ""
+              }
               className="w-full h-full"
               loading="lazy"
               width="370"
@@ -331,8 +337,7 @@ const PropertyCard = ({ data }) => {
             <ul>
               <li className="flex flex-wrap items-center justify-between">
                 <span className="font-lora text-base text-primary leading-none font-medium">
-                  Price:{" "}
-                  {parseFloat(parseInt(data.propertyPrice) / Math.pow(10, 18))}{" "}
+                  Price: {parseFloat(parseInt(data.price) / Math.pow(10, 18))}{" "}
                   <i className="fab fa-ethereum"></i>{" "}
                 </span>
               </li>

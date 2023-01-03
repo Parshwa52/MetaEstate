@@ -55,12 +55,13 @@ contract morter {
         prop.capital_to_be_raised = 0;
         prop.nftTokenId = tokenId;
         prop.firstEmiDone = false;
-        allproperties[prop.property_id] = prop;
         propertycounter += 1;
         if (_price == 0) {
+            prop.status = 500;
             droppedProperties.push(tokenId);
             dropStatus[tokenId] = false;
         }
+        allproperties[prop.property_id] = prop;
         //nftContract.approveContract(address(this),tokenId);
     }
 
@@ -70,6 +71,7 @@ contract morter {
     //200) mortgage initiated
     //300) risk free investors invested
     //400) final trade done
+    //500) drop property
 
     function direct_buy_property(
         uint256 property_id,
