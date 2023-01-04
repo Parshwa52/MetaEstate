@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Route, Routes } from "react-router-dom";
+import { HashRouter,Switch,Route,Routes, BrowserRouter} from 'react-router-dom';
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Dashboard from "./pages/Dashboard";
@@ -138,7 +138,8 @@ const App = () => {
         }}
       >
         <Header />
-        <Routes>
+        <BrowserRouter>
+          <Routes>
           <Route exact path="/" element={<HomePage />} />
           <Route exact path="/listings" element={<PropertyListing />} />
           <Route exact path="/add-property" element={<ListProperty />} />
@@ -150,7 +151,8 @@ const App = () => {
             path="/PropertyMarketplace"
             element={<PropertyMarketplace />}
           />
-        </Routes>
+          </Routes>
+        </BrowserRouter>
       </BlockchainContext.Provider>
       <Footer />
     </div>
