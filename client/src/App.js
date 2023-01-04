@@ -140,13 +140,13 @@ const App = () => {
         <Header />
         <BrowserRouter>
           <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="listings" element={<PropertyListing />} />
-          <Route path="add-property" element={<ListProperty />} />
-          <Route path="property-details" element={<PropertyDetails />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="video" element={<Livepeer />} />
-          <Route path="PropertyMarketplace" element={<PropertyMarketplace />}/>
+          <Route path="/" exact element={<HomePage />} />
+          <Route path="/listings" element={<PropertyListing />} />
+          <Route path="/add-property" element={<ListProperty />} />
+          <Route path="/property-details" element={<PropertyDetails />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/video" element={<Livepeer />} />
+          <Route path="/PropertyMarketplace" element={<PropertyMarketplace />}/>
           </Routes>
         </BrowserRouter>
       </BlockchainContext.Provider>
