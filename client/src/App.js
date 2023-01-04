@@ -138,7 +138,6 @@ const App = () => {
         }}
       >
         <Header />
-        <BrowserRouter>
           <Routes>
           <Route path="/" exact element={<HomePage />} />
           <Route path="/listings" element={<PropertyListing />} />
@@ -148,7 +147,6 @@ const App = () => {
           <Route path="/video" element={<Livepeer />} />
           <Route path="/PropertyMarketplace" element={<PropertyMarketplace />}/>
           </Routes>
-        </BrowserRouter>
       </BlockchainContext.Provider>
       <Footer />
     </div>
