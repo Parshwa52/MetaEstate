@@ -147,6 +147,8 @@ const PropertyListing = () => {
     //filterDroppedProperties = [5,7,8]
     //random from 0 to 2
     e.preventDefault();
+    let curentDate = new Date();
+    let timeDivision = 1000 * 60 * 60 * 24;
     let droppedProperties;
     let prevDropClaimStatus;
     try {
@@ -156,12 +158,27 @@ const PropertyListing = () => {
           filter: { owner: accounts[0] },
         }
       );
-
+      let prevClaimDate = new Date();
+      prevClaimDate.setDate(prevClaimDate.getDate() - 5);
+      let dayDiff = Math.round(
+        (curentDate.getTime() - prevClaimDate.getTime()) / timeDivision
+      );
+      if (dayDiff <= 0) {
+        console.log(dayDiff);
+        alert(
+          `Only one drop property can be claimed in a day ${prevClaimDate}`
+        );
+        return;
+      }
       droppedProperties = await morterContract.methods
         .getAllDroppedProperties()
         .call();
     } catch (e) {
       console.log(e);
+    }
+    if (!droppedProperties) {
+      alert("No NFT drops available");
+      return;
     }
     console.log(droppedProperties, prevDropClaimStatus);
     // var filterDroppedProperties = await checkDropStatus(droppedProperties);

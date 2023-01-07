@@ -19,37 +19,14 @@ import TableRow from "@mui/material/TableRow";
 import BlockchainContext from "../contexts/BlockchainContext";
 
 const columns = [
-  { id: "name", label: "Name", minWidth: 170 },
-  { id: "code", label: "ISO\u00a0Code", minWidth: 100 },
-  {
-    id: "population",
-    label: "Population",
-    minWidth: 170,
-    align: "right",
-    format: (value) => value.toLocaleString("en-US"),
-  },
-  {
-    id: "size",
-    label: "Size\u00a0(km\u00b2)",
-    minWidth: 170,
-    align: "right",
-    format: (value) => value.toLocaleString("en-US"),
-  },
-  {
-    id: "density",
-    label: "Density",
-    minWidth: 170,
-    align: "right",
-    format: (value) => value.toFixed(2),
-  },
+  { id: "Bidder Address", label: "Name", minWidth: 170 },
+  { id: "Bid Amount", label: "ISO\u00a0Code", minWidth: 100 },
 ];
 
 function createData(name, code, population, size) {
   const density = population / size;
   return { name, code, population, size, density };
 }
-
-
 
 const rows = [
   createData("India", "IN", 1324171354, 3287263),
@@ -129,7 +106,7 @@ export default function EnterAuctionModal({ open, setOpen, data }) {
     try {
       await auctionContract.methods.bid(data.nftId).send({
         from: accounts[0],
-        value: parseInt(parseFloat(bidAmount) * Math.pow(10, 18)),
+        value: parseInt(parseFloat(bidAmount) * Math.pow(10, 18)).toString(),
       });
       alert("Bid Submitted Successfully");
       window.location.reload();
@@ -140,10 +117,41 @@ export default function EnterAuctionModal({ open, setOpen, data }) {
   };
 
   const getAuctionData = async () => {
-    const response = await auctionContract.getPastEvents("Bid", {
-      fromBlock: 0,
-      filter: { project_id: data.nftId },
-    });
+    // let events = await auctionContract.allEvents({
+    //   fromBlock: 0,
+    //   toBlock: "latest",
+    // });
+    // console.log(events);
+    // const options = {
+    //   method: "POST",
+    //   headers: {
+    //     accept: "application/json",
+    //     "content-type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     id: 1,
+    //     jsonrpc: "2.0",
+    //     method: "eth_getFilterLogs",
+    //     params: [data.nftId],
+    //   }),
+    // };
+
+    // fetch(
+    //   "https://polygon-mumbai.g.alchemy.com/v2/MK5PjLnWBkouYRAT1TCz9oXIIPN6pzqC",
+    //   options
+    // )
+    //   .then((response) => response.json())
+    //   .then((response) => console.log(response))
+    //   .catch((err) => console.error(err));
+    let blockNumber = (await web3.eth.getBlockNumber()) - 999;
+    let response = await auctionContract.getPastEvents(
+      "Bid",
+      {},
+      function (err, events) {
+        console.log(events);
+      }
+    );
+
     console.log(response);
     setAllBids(response);
   };
@@ -152,6 +160,8 @@ export default function EnterAuctionModal({ open, setOpen, data }) {
     getAuctionData();
     // eslint-disable-next-line
   }, []);
+
+  useEffect(() => {}, [allBids]);
 
   return (
     <div>
@@ -179,7 +189,7 @@ export default function EnterAuctionModal({ open, setOpen, data }) {
           <input
             className="font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-primary border-opacity-60 rounded-[8px] pl-[40px] pr-[20px] py-[8px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] bg-white"
             type="text"
-            placeholder="Your Bid in Ethers"
+            placeholder="Your Bid in MATIC"
             value={bidAmount}
             disabled={false}
             style={{ color: "black" }}
@@ -214,7 +224,7 @@ export default function EnterAuctionModal({ open, setOpen, data }) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows
+                {allBids
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => {
                     return (

@@ -38,7 +38,7 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default function InitiateMortgage({ open, setOpen, data }) {
+export default function DashboardAuctionModal({ open, setOpen, data }) {
   const [startAmount, setStartAmount] = useState("");
   const [duration, setDuration] = useState("");
   const {
@@ -57,42 +57,47 @@ export default function InitiateMortgage({ open, setOpen, data }) {
 
   const startAuction = async (e) => {
     e.preventDefault();
-    try{
-        console.log({auctionContractAddress});
-        console.log(data.nftId);
-        await propNFTContract.methods
+    try {
+      console.log({ auctionContractAddress });
+      console.log(data.nftId);
+      await propNFTContract.methods
         .approveContract(auctionContractAddress, data.nftId)
         .send({
           from: accounts[0],
-        }).then(async()=>{
-            let amountInWei = parseInt(startAmount)*Math.pow(10,18);
-             await auctionContract.methods.start(propNFTContractAddress,parseInt(data.nftId),amountInWei,parseInt(duration)).send({
-                from: accounts[0]
+        })
+        .then(async () => {
+          let amountInWei = (
+            parseInt(startAmount) * Math.pow(10, 18)
+          ).toString();
+          await auctionContract.methods
+            .start(
+              propNFTContractAddress,
+              parseInt(data.nftId),
+              amountInWei,
+              parseInt(duration)
+            )
+            .send({
+              from: accounts[0],
             });
-            alert("Auction Started Successfully");
-            window.location.reload();
+          alert("Auction Started Successfully");
+          window.location.reload();
         });
+    } catch (e) {
+      alert(e.message);
     }
-    catch(e)
-    {
-        alert(e.message);
-    }
-
   };
 
   const endAuction = async (e) => {
     e.preventDefault();
-    try{
-    await auctionContract.methods.end(parseInt(data.nftId)).send({
-        from: accounts[0]
-    });
-    alert("Auction Ended Successfully");
+    try {
+      await auctionContract.methods.end(parseInt(data.nftId)).send({
+        from: accounts[0],
+      });
+      alert("Auction Ended Successfully");
+    } catch (e) {
+      alert(e.message);
     }
-    catch(e)
-    {
-        alert(e.message);
-    }
-  }
+  };
 
   return (
     <div>
@@ -119,7 +124,7 @@ export default function InitiateMortgage({ open, setOpen, data }) {
           <input
             className="font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-primary border-opacity-60 rounded-[8px] pl-[40px] pr-[20px] py-[8px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] bg-white"
             type="text"
-            placeholder="The Amount in Ethers"
+            placeholder="The Amount in MATIC"
             value={startAmount}
             disabled={false}
             style={{ color: "black" }}
@@ -131,7 +136,8 @@ export default function InitiateMortgage({ open, setOpen, data }) {
             style={{ color: "white", marginBottom: "7px" }}
             className="text-primary leading-none text-[15px] font-lora  mb-[34px] font-medium"
           >
-            Enter The duration of auction in seconds <span className="text-secondary">.</span>
+            Enter The duration of auction in seconds{" "}
+            <span className="text-secondary">.</span>
           </h5>
           <input
             className="font-light w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-primary border-opacity-60 rounded-[8px] pl-[40px] pr-[20px] py-[8px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] bg-white"
@@ -155,7 +161,8 @@ export default function InitiateMortgage({ open, setOpen, data }) {
             variant="contained"
             style={{ fontWeight: "700", backgroundColor: "#2192FF" }}
           >
-End Auction          </Button>
+            End Auction{" "}
+          </Button>
         </DialogActions>
       </Dialog>
     </div>

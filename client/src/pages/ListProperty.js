@@ -27,7 +27,7 @@ const ListProperty = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [metaverseName, setMetaverseName] = useState("");
   const [propertyTitle, setPropertyTitle] = useState("");
-  const [propertyPrice, setPropertyPrice] = useState("");
+  const [propertyPrice, setPropertyPrice] = useState("0");
   const [propertyDescription, setPropertyDescription] = useState("");
   const [coordinateX, setCoordinateX] = useState(0);
   const [coordinateY, setcoordinateY] = useState(0);
@@ -57,9 +57,10 @@ const ListProperty = () => {
     init();
 
     if (isExisting) {
+      console.log(typeof data.price, data.price);
       setMetaverseName(data.metaverseName);
       setPropertyTitle(data.name);
-      setPropertyPrice(data.price);
+      setPropertyPrice((parseInt(data.price) / Math.pow(10, 18)).toString());
       setPropertyDescription(data.description);
       setCoordinateX(data.coordinateX);
       setcoordinateY(data.coordinateY);
@@ -110,9 +111,10 @@ const ListProperty = () => {
     // console.log(propertyDescription);
     // console.log(coordinateX);
     // console.log(coordinateY);
-    let priceInWei = await web3.utils.toBN(
-      await web3.utils.toWei(propertyPrice.toString(), "ether").toString()
-    );
+    let priceInWei = await web3.utils
+      .toWei(propertyPrice.toString(), "ether")
+      .toString();
+
     console.log(
       priceInWei,
       web3.utils.toWei(propertyPrice.toString(), "ether").toString()
@@ -195,11 +197,9 @@ const ListProperty = () => {
         .then((tokenId) => {
           //console.log({ tokenId });
           console.log(priceInWei);
-          morterContract.methods
-            .listProperty(priceInWei, tokenId)
-            .send({
-              from: currentAccount,
-            });
+          morterContract.methods.listProperty(priceInWei, tokenId).send({
+            from: currentAccount,
+          });
         });
     };
   };
@@ -231,6 +231,13 @@ const ListProperty = () => {
   //     accounts[0].toLowerCase()
   // )
   //   return <Navigate to="/" />;
+  console.log(
+    "price",
+    propertyPrice,
+    isExisting
+      ? (parseInt(propertyPrice) / Math.pow(10, 18)).toString()
+      : propertyPrice.toString()
+  );
 
   return (
     <div className="font-karla text-body text-tiny">
@@ -354,11 +361,7 @@ const ListProperty = () => {
                       className=" w-full leading-[1.75] placeholder:opacity-100 placeholder:text-body border border-[#1B2D40] border-opacity-60 rounded-[8px] p-[15px] focus:border-secondary focus:border-opacity-60 focus:outline-none focus:drop-shadow-[0px_6px_15px_rgba(0,0,0,0.1)] h-[60px] "
                       type="text"
                       placeholder="NFT Price"
-                      value={
-                        isExisting
-                          ? parseInt(propertyPrice) / Math.pow(10, 18)
-                          : propertyPrice
-                      }
+                      value={propertyPrice}
                       onChange={(e) => setPropertyPrice(e.target.value)}
                     />
                   </div>
@@ -547,7 +550,7 @@ const ListProperty = () => {
               onClick={mintNFT}
               className="before:rounded-md before:block before:absolute before:left-auto before:right-0 before:inset-y-0 before:-z-[1] before:bg-secondary before:w-0 hover:before:w-full hover:before:left-0 hover:before:right-auto before:transition-all leading-none px-[40px] py-[15px] capitalize font-medium text-white text-[14px] xl:text-[16px] relative after:block after:absolute after:inset-0 after:-z-[2] after:bg-primary after:rounded-md after:transition-all"
             >
-              Add Property
+              {isExisting ? <>Sell property</> : <>Add Property</>}
             </button>
           </div>
         </div>

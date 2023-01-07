@@ -180,7 +180,7 @@ const PropertyCard = ({ data }) => {
               loading="lazy"
               width="370"
               height="266"
-              alt="Duplex de Villa."
+              alt="Property Image"
               style={{ cursor: "pointer" }}
               onClick={() => navigate("/property-details", { state: { data } })}
             />
@@ -309,26 +309,38 @@ const PropertyCard = ({ data }) => {
                 className="flex flex-wrap items-center pr-[25px] sm:pr-[5px] md:pr-[25px] border-r border-[#E0DEDE]"
               >
                 <PermIdentityIcon />
-                {data.creator.toString()[0]}
-                {data.creator.toString()[1]}
-                {data.creator.toString()[2]}
-                {data.creator.toString()[3]}
-                {data.creator.toString()[4]}
-                {data.creator.toString()[5]}.....
-                {data.creator.toString().slice(-4)}
+                {data.creator.length > 0 ? (
+                  <>
+                    {data.creator.toString()[0]}
+                    {data.creator.toString()[1]}
+                    {data.creator.toString()[2]}
+                    {data.creator.toString()[3]}
+                    {data.creator.toString()[4]}
+                    {data.creator.toString()[5]}.....
+                    {data.creator.toString().slice(-4)}
+                  </>
+                ) : (
+                  <span>No Data</span>
+                )}
               </li>
               <li
                 style={{ fontSize: "16px", margin: "0 10px" }}
                 className="flex flex-wrap items-center pr-[25px] sm:pr-[10px] md:pr-[25px] border-r border-[#E0DEDE]"
               >
                 <HomeIcon />
-                {data.nftContract.toString()[0]}
-                {data.nftContract.toString()[1]}
-                {data.nftContract.toString()[2]}
-                {data.nftContract.toString()[3]}
-                {data.nftContract[4]}
-                {data.nftContract[5]}.....
-                {data.nftContract.slice(-4)}
+                {data.nftContract.length > 0 ? (
+                  <>
+                    {data.nftContract.toString()[0]}
+                    {data.nftContract.toString()[1]}
+                    {data.nftContract.toString()[2]}
+                    {data.nftContract.toString()[3]}
+                    {data.nftContract[4]}
+                    {data.nftContract[5]}.....
+                    {data.nftContract.slice(-4)}
+                  </>
+                ) : (
+                  <span>No Data</span>
+                )}
               </li>
               <li className="flex flex-wrap items-center">
                 [{data.coordinateX}]{"\u00A0"}:{"\u00A0"}[{data.coordinateY}]

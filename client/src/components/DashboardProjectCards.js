@@ -25,7 +25,7 @@ const DashboardProjectCard = ({ data }) => {
         <img
           src={data.logo}
           className="card-img-top"
-          alt="..."
+          alt="logo"
           style={{
             borderRadius: "20px",
             height: "12rem",

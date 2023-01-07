@@ -41,18 +41,19 @@ export default function Dashboard() {
       var result;
       try {
         result = await fetch(
-          `https://polygon-mumbai.g.alchemy.com/nft/v2/${ALCHEMY_KEY}/getNFTMetadata?contractAddress=${propNFTContractAddress}&tokenId=${i}&tokenType=ERC721`,
+          `https://polygon-mumbai.g.alchemy.com/nft/v2/${ALCHEMY_KEY}/getNFTMetadata?contractAddress=${propNFTContractAddress}&tokenId=${i}&tokenType=ERC721`
         ).then((response) => response.text());
       } catch (error) {
         console.log("error", error);
       }
       var resultJSON = await JSON.parse(result);
-      console.log({ resultJSON });
       var currentPropertyData = resultJSON.metadata;
 
       //get property data from morter contract
       var propertyData = await morterContract.methods.allproperties(i).call();
       var auctionData = await auctionContract.methods.allAuctions(i).call();
+      console.log({ resultJSON, propertyData, totalPropertyCount });
+
       if (propertyData.owner.toLowerCase() === accounts[0].toLowerCase()) {
         console.log(propertyData);
         console.log(auctionData);
@@ -71,10 +72,8 @@ export default function Dashboard() {
     Setmyprojects(allproperties);
   };
 
-
   useEffect(() => {
-    if (morterContract)
-    fetchData();
+    if (morterContract) fetchData();
   }, [accounts]);
   return (
     <>
