@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import InitiateMortgage from "./InitiateMortgageModal";
 import InvestMoneyModal from "./InvestMoneyModal";
@@ -9,20 +9,30 @@ import BlockchainContext from "../contexts/BlockchainContext";
 const PropertyCard = ({ data }) => {
   console.log({ data });
   const {
-    web3,
+    // web3,
     accounts,
-    propNFTContract,
+    // propNFTContract,
     morterContract,
-    auctionContract,
-    propNFTContractAddress,
-    morterContractAddress,
-    auctionContractAddress,
+    // auctionContract,
+    // propNFTContractAddress,
+    // morterContractAddress,
+    // auctionContractAddress,
   } = useContext(BlockchainContext);
+  // const {
+  //   web3,
+  //   accounts,
+  //   propNFTContract,
+  //   morterContract,
+  //   auctionContract,
+  //   propNFTContractAddress,
+  //   morterContractAddress,
+  //   auctionContractAddress,
+  // } = useContext(BlockchainContext);
   const [mortgageModal, setMortgageModal] = useState(false);
   const [investMoneyModal, setInvestMoneyModal] = useState(false);
   const [enterAuctionModal, setEnterAuctionModal] = useState(false);
 
-  const [auctionStatus, setAuctionStatus] = useState(true);
+  // const [auctionStatus, setAuctionStatus] = useState(true);
 
   const handleClickOpenMortgageModal = () => {
     setMortgageModal(!mortgageModal);
@@ -34,15 +44,15 @@ const PropertyCard = ({ data }) => {
   const handleClickOpenAuctionModal = () => {
     setEnterAuctionModal(!enterAuctionModal);
   };
-  const getAuctionStatus = () => {
-    //call to the Auction contract allAuctions function
-    let aucStatus;
-    //setAuctionStatus(auctionStatus)
-  };
+  // const getAuctionStatus = () => {
+  //   //call to the Auction contract allAuctions function
+  //   let aucStatus;
+  //   //setAuctionStatus(auctionStatus)
+  // };
 
-  useEffect(() => {
-    getAuctionStatus();
-  }, [setMortgageModal]);
+  // useEffect(() => {
+  //   getAuctionStatus();
+  // }, [setMortgageModal]);
   let navigate = useNavigate();
 
   const buyDirect = async (e) => {
@@ -180,7 +190,7 @@ const PropertyCard = ({ data }) => {
               loading="lazy"
               width="370"
               height="266"
-              alt="Property Image"
+              alt="Property Snapshot"
               style={{ cursor: "pointer" }}
               onClick={() => navigate("/property-details", { state: { data } })}
             />

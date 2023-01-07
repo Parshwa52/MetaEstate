@@ -37,6 +37,7 @@ const Header = () => {
     };
 
     window.ethereum.on("accountsChanged", listener);
+    // eslint-disable-next-line
   }, []);
   return (
     <>

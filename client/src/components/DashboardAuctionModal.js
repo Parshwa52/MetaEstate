@@ -42,15 +42,27 @@ export default function DashboardAuctionModal({ open, setOpen, data }) {
   const [startAmount, setStartAmount] = useState("");
   const [duration, setDuration] = useState("");
   const {
-    web3,
+    // web3,
     accounts,
     propNFTContract,
-    morterContract,
+    // morterContract,
     auctionContract,
     propNFTContractAddress,
-    morterContractAddress,
+    // morterContractAddress,
     auctionContractAddress,
   } = useContext(BlockchainContext);
+
+  // const {
+  //   web3,
+  //   accounts,
+  //   propNFTContract,
+  //   morterContract,
+  //   auctionContract,
+  //   propNFTContractAddress,
+  //   morterContractAddress,
+  //   auctionContractAddress,
+  // } = useContext(BlockchainContext);
+
   const handleClose = () => {
     setOpen(false);
   };

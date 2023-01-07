@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { HashRouter,Switch,Route,Routes, BrowserRouter} from 'react-router-dom';
+import { Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Dashboard from "./pages/Dashboard";
@@ -20,17 +20,17 @@ const getWeb3 = async () => {
   let tempWeb3 = undefined;
   if (window.ethereum) {
     tempWeb3 = new Web3(window.ethereum);
-    try {
-      // Request account access if needed
-      //await window.ethereum.enable();
-      const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts",
-      });
+    // try {
+    //   // Request account access if needed
+    //   //await window.ethereum.enable();
+    //   const accounts = await window.ethereum.request({
+    //     method: "eth_requestAccounts",
+    //   });
 
-      //const accounts = await window.web3.eth.getAccounts();
-    } catch (error) {
-      // User denied account access...
-    }
+    //   //const accounts = await window.web3.eth.getAccounts();
+    // } catch (error) {
+    //   // User denied account access...
+    // }
   }
   // Legacy dapp browsers...
   else if (window.web3) {
@@ -92,7 +92,7 @@ const App = () => {
       }
 
       //Importing the morter Contract
-      var networkdata = morter.networks[networkId];
+      networkdata = morter.networks[networkId];
       console.log("morter=", networkdata);
       if (networkdata) {
         const abi = morter.abi;
@@ -138,15 +138,19 @@ const App = () => {
         }}
       >
         <Header />
-          <Routes>
+        <Routes>
           <Route path="/" exact element={<HomePage />} />
           <Route path="/listings" exact element={<PropertyListing />} />
           <Route path="/add-property" exact element={<ListProperty />} />
           <Route path="/property-details" exact element={<PropertyDetails />} />
           <Route path="/dashboard" exact element={<Dashboard />} />
           <Route path="/video" exact element={<Livepeer />} />
-          <Route path="/PropertyMarketplace" exact element={<PropertyMarketplace />}/>
-          </Routes>
+          <Route
+            path="/PropertyMarketplace"
+            exact
+            element={<PropertyMarketplace />}
+          />
+        </Routes>
       </BlockchainContext.Provider>
       <Footer />
     </div>

@@ -74,6 +74,7 @@ const ListProperty = () => {
     };
 
     window.ethereum.on("accountsChanged", listener);
+    // eslint-disable-next-line
   }, []);
 
   const uploadFileToIPFS = async (fileBlob) => {

@@ -7,6 +7,7 @@ import Container from "@mui/material/Container";
 import DashboardProjects from "../components/DashboardProjects";
 import PersonalInfo from "../components/Personalinfo";
 import BlockchainContext from "../contexts/BlockchainContext";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -19,17 +20,31 @@ const Item = styled(Paper)(({ theme }) => ({
 export default function Dashboard() {
   const [myprojects, Setmyprojects] = useState([]);
   const {
-    web3,
+    //web3,
     accounts,
-    propNFTContract,
+    //propNFTContract,
     morterContract,
     auctionContract,
     propNFTContractAddress,
-    morterContractAddress,
-    auctionContractAddress,
+    //morterContractAddress,
+    //auctionContractAddress,
   } = useContext(BlockchainContext);
 
+  // const {
+  //   web3,
+  //   accounts,
+  //   propNFTContract,
+  //   morterContract,
+  //   auctionContract,
+  //   propNFTContractAddress,
+  //   morterContractAddress,
+  //   auctionContractAddress,
+  // } = useContext(BlockchainContext);
+
+  const [loading, setLoading] = useState(false);
+
   const fetchData = async () => {
+    setLoading(true);
     const totalPropertyCount = await morterContract.methods
       .propertycounter()
       .call();
@@ -70,10 +85,12 @@ export default function Dashboard() {
       console.log(allproperties);
     }
     Setmyprojects(allproperties);
+    setLoading(false);
   };
 
   useEffect(() => {
     if (morterContract) fetchData();
+    // eslint-disable-next-line
   }, [accounts]);
   return (
     <>
@@ -121,12 +138,37 @@ export default function Dashboard() {
                   style={{ borderRadius: "20px", border: "3px solid white" }}
                 >
                   <Grid container spacing={3}>
-                    {myprojects &&
-                      myprojects.map((data, key) => (
-                        <Grid item xs={4} key={key}>
-                          <DashboardProjects data={data} key={key} />
-                        </Grid>
-                      ))}{" "}
+                    {loading === false ? (
+                      <>
+                        {myprojects.length > 0 ? (
+                          <>
+                            {myprojects &&
+                              myprojects.map((data, key) => (
+                                <Grid item xs={4} key={key}>
+                                  <DashboardProjects data={data} key={key} />
+                                </Grid>
+                              ))}{" "}
+                          </>
+                        ) : (
+                          <Grid
+                            item
+                            style={{
+                              fontWeight: "700",
+                              fontFamily: "Georgia",
+                              fontSize: "42px",
+                              color: "red",
+                              textAlign: "center",
+                            }}
+                          >
+                            You dont own any properties{" "}
+                          </Grid>
+                        )}
+                      </>
+                    ) : (
+                      <Grid item>
+                        <CircularProgress size={70} />
+                      </Grid>
+                    )}
                   </Grid>
                 </Item>
               </Grid>

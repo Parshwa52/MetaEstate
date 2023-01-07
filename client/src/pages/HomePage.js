@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useContext } from "react";
-import Web3 from "web3";
+import React, { useEffect, useContext } from "react";
 import BlockchainContext from "../contexts/BlockchainContext";
 function Homepage() {
-  const [account, setAccounts] = useState("");
+  // const [account, setAccounts] = useState("");
   const { web3, accounts, propNFTContract, morterContract, auctionContract } =
     useContext(BlockchainContext);
   useEffect(() => {
@@ -13,6 +12,7 @@ function Homepage() {
       morterContract,
       auctionContract,
     });
+    // eslint-disable-next-line
   }, []);
   return (
     <div className="root">
@@ -23,7 +23,7 @@ function Homepage() {
 
           <div className="relative">
             {/* <!-- Hero section start --> */}
-            <h1>{account}</h1>
+            {/* <h1>{account}</h1> */}
             <section className="bg-[#FFF6F0] relative before:absolute before:inset-0 before:content-[''] before:bg-[#060606] before:opacity-[50%]">
               <div className="lg:h-[720px] xl:h-[830px]">
                 <img

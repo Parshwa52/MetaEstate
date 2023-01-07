@@ -1,10 +1,10 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import "./DashboardProjectStyles.css";
 import Button from "@mui/material/Button";
-import BlockchainContext from "../contexts/BlockchainContext";
+// import BlockchainContext from "../contexts/BlockchainContext";
 import { useNavigate } from "react-router-dom";
 import DashboardAuctionModal from "./DashboardAuctionModal";
 

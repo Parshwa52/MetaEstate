@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 const PropertyDetails = () => {
   let navigate = useNavigate();
   let location = useLocation();
+  // eslint-disable-next-line
   const [data, setData] = useState(location.state.data);
   return (
     <div className="font-karla text-body text-tiny">
@@ -68,7 +69,7 @@ const PropertyDetails = () => {
                   className="w-auto h-auto"
                   loading="lazy"
                   style={{ width: "100%" }}
-                  alt="Property Image"
+                  alt="Property Snapshot"
                   height="465"
                 />
                 <div className="mt-[45px] mb-[35px]">

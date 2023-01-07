@@ -42,15 +42,27 @@ export default function InitiateMortgage({ open, setOpen, data }) {
   const [amount, setAmount] = useState("");
   const [months, setMonths] = useState("");
   const {
-    web3,
+    // web3,
     accounts,
-    propNFTContract,
+    // propNFTContract,
     morterContract,
-    auctionContract,
-    propNFTContractAddress,
-    morterContractAddress,
-    auctionContractAddress,
+    // auctionContract,
+    // propNFTContractAddress,
+    // morterContractAddress,
+    // auctionContractAddress,
   } = useContext(BlockchainContext);
+
+  // const {
+  //   web3,
+  //   accounts,
+  //   propNFTContract,
+  //   morterContract,
+  //   auctionContract,
+  //   propNFTContractAddress,
+  //   morterContractAddress,
+  //   auctionContractAddress,
+  // } = useContext(BlockchainContext);
+
   const handleClose = () => {
     setOpen(false);
   };
